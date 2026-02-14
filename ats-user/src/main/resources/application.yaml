@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ats_users
+    username: root
+    password:
+
+  jpa:
+    hibernate:
+      dll-auto:update
