@@ -9,7 +9,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter@Builder
+@Setter
+@Builder
 @ToString(exclude = "roles")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
@@ -23,7 +24,7 @@ public class User {
     String phone;
     String indicativo;
     String passwordHash;
-    transient String repassword;
+
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     Long createdBy;
@@ -33,11 +34,9 @@ public class User {
 
     public void addRole(Role r){
         roles.add(r);
-        r.getUsers().add(this);
     }
 
     public void removeRole(Role r) {
         roles.remove(r);
-        r.getUsers().remove(this);
     }
 }
