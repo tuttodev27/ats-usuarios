@@ -1,4 +1,4 @@
-package com.ats.user.domain.port.in;
+package com.ats.user.domain.port.out;
 
 import com.ats.user.domain.model.User;
 

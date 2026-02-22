@@ -1,6 +1,14 @@
 package com.ats.user.domain.model;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -13,18 +21,17 @@ import java.util.Set;
 @Builder
 @ToString(exclude = "roles")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
 
     @EqualsAndHashCode.Include
     Long id;
-
     String name;
     String lastName;
     String email;
     String phone;
     String indicativo;
     String passwordHash;
-
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     Long createdBy;

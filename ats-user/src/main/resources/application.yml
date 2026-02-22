@@ -1,9 +1,18 @@
+server:
+  port: 8083
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ats_users
-    username: root
-    password:
+    url: jdbc:postgresql://localhost:5433/ats_users
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
 
   jpa:
     hibernate:
-      dll-auto:update
+      ddl-auto: update   # OJO: ddl, no dll
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect

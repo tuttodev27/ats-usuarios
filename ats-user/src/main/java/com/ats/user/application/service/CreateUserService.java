@@ -1,4 +1,21 @@
 package com.ats.user.application.service;
 
-public class CreateUserService {
+import com.ats.user.domain.model.User;
+import com.ats.user.domain.port.in.CreateUserUseCase;
+import com.ats.user.domain.port.out.UserRepositoryPort;
+
+public class CreateUserService implements CreateUserUseCase {
+
+    public final UserRepositoryPort userRepository;
+
+    public CreateUserService(UserRepositoryPort userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public User create(User user) {
+        return userRepository.save(user);
+    }
+
+
 }

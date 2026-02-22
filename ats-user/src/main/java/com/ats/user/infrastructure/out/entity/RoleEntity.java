@@ -1,5 +1,6 @@
 package com.ats.user.infrastructure.out.entity;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,45 +26,34 @@ import java.util.Set;
 
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name= "users", indexes={
-        @Index(name= "idx_user_email", columnList="email", unique=true)
+@NoArgsConstructor
+@Builder
+@Table(name="roles", indexes = {
+        @Index(name = "idx_role_name", columnList = "name", unique = true)
 })
-@FieldDefaults(level=AccessLevel.PRIVATE)
-public class UserEntity {
+@Entity
+@FieldDefaults(level = AccessLevel.PRIVATE)
+
+public class RoleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     @Column(nullable = false)
     String name;
+    @Column(length = 255)
+    String description;
     @Column(nullable = false)
-    String lastName;
-    @Column(nullable = false, unique = true)
-    String email;
-    @Column(length = 5)
-    String indicativo;
-    @Column(length = 20)
-    String phone;
-
+    Boolean active;
     @Column(nullable = false)
-    String passwordHash;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private Long createdBy;
-    private Long updatedBy;
-
-    private Boolean active;
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn (name= "user_id", nullable = false),
-            inverseJoinColumns = @JoinColumn(name = "role_id", nullable=false)
+    @JoinTable(name = "role_permissions",
+            joinColumns = @JoinColumn(name = "role_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "permission_id", nullable = false)
     )
     @Builder.Default
-    private Set<RoleEntity> roles = new HashSet<>();
-
+    Set<PermissionEntity> permissions = new HashSet<>();
 }
