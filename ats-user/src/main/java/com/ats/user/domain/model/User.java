@@ -30,7 +30,7 @@ public class User {
     String lastName;
     String email;
     String phone;
-    String indicativo;
+    String countryCode;
     String passwordHash;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

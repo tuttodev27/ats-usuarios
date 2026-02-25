@@ -7,5 +7,5 @@ import java.util.Optional;
 public interface UserRepositoryPort {
     User save(User user);
     Optional<User> findByEmail(String email);
-    Optional<User> findByLastName(String lastName);
+    boolean existsByEmail(String email);
 }
