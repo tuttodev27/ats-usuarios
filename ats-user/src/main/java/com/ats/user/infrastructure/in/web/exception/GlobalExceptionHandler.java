@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = {EmailAlreadyExistException.class})
     public ResponseEntity<ErrorResponse> handleEmailExists(EmailAlreadyExistException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                new ErrorResponse(Instant.now(), 409, "EMAIL_ALREDY_EXIST", ex.getMessage(), request.getRequestURI())
+                new ErrorResponse(Instant.now(), 409, "EMAIL_ALREADY_EXISTS", ex.getMessage(), request.getRequestURI())
         );
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)

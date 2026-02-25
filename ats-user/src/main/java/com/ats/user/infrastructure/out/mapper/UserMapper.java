@@ -8,8 +8,10 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 
 public interface UserMapper {
+    @Mapping(target="rePasswordHash", ignore= true)
     @Mapping(target="roles",  ignore= true)
     UserEntity toEntity(User user);
+    @Mapping(target="rePasswordHash", ignore= true)
     User toDomain(UserEntity userEntity);
 
 }

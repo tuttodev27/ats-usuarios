@@ -32,6 +32,7 @@ public class User {
     String phone;
     String countryCode;
     String passwordHash;
+    String rePasswordHash;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     Long createdBy;

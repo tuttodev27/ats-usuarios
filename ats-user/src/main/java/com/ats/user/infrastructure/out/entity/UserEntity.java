@@ -44,7 +44,7 @@ public class UserEntity {
     @Column(nullable = false, unique = true)
     String email;
     @Column(length = 5)
-    String indicativo;
+    String countryCode;
     @Column(length = 20)
     String phone;
 
