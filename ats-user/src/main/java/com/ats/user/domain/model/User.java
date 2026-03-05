@@ -32,9 +32,9 @@ public class User {
     String phone;
     String countryCode;
     String passwordHash;
-    String rePasswordHash;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+    Boolean active;
     Long createdBy;
     Long updatedBy;
 
