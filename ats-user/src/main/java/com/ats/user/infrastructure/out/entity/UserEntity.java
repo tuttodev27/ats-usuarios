@@ -43,7 +43,7 @@ public class UserEntity {
     String lastName;
     @Column(nullable = false, unique = true)
     String email;
-    @Column(length = 5)
+    @Column(name = "country_code", length = 5)
     String countryCode;
     @Column(length = 20)
     String phone;

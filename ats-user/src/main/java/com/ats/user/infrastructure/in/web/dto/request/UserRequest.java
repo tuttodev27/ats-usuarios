@@ -29,6 +29,10 @@ public record UserRequest(
 
         @NotBlank
         @Size(min= 8, max = 100)
-        String password
+        String password,
+
+        @NotBlank
+        @Size(max = 60)
+        String role
 ) {
 }

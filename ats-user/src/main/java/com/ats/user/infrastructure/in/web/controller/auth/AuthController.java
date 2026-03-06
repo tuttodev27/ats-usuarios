@@ -1,8 +1,10 @@
-package com.ats.user.infrastructure.in.web.auth;
+package com.ats.user.infrastructure.in.web.controller.auth;
 
 import com.ats.user.infrastructure.in.web.dto.request.LoginRequest;
 import com.ats.user.infrastructure.in.web.dto.response.LoginResponse;
 import com.ats.user.infrastructure.in.web.security.jwt.JwtService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Auth", description = "Autenticacion y emision de token JWT")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -33,6 +36,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Iniciar sesion", description = "Autentica usuario por email/password y devuelve token JWT")
     public LoginResponse login(@Valid @RequestBody LoginRequest request) {
 
         authenticationManager.authenticate(

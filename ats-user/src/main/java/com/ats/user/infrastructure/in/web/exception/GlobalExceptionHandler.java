@@ -2,6 +2,7 @@ package com.ats.user.infrastructure.in.web.exception;
 
 import com.ats.user.domain.exception.EmailAlreadyExistException;
 import com.ats.user.domain.exception.InvalidPasswordException;
+import com.ats.user.domain.exception.RoleNotFoundException;
 import com.ats.user.domain.exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 new ErrorResponse(Instant.now(), 404, "USER_NOT_FOUND", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleRoleNotFound(RoleNotFoundException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ErrorResponse(Instant.now(), 400, "ROLE_NOT_FOUND", ex.getMessage(), request.getRequestURI())
         );
     }
 

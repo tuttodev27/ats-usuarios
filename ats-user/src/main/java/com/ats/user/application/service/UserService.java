@@ -1,6 +1,7 @@
 package com.ats.user.application.service;
 
 import com.ats.user.domain.exception.EmailAlreadyExistException;
+import com.ats.user.domain.exception.RoleNotFoundException;
 import com.ats.user.domain.exception.UserNotFoundException;
 import com.ats.user.domain.model.User;
 import com.ats.user.domain.port.in.UserUseCase;
@@ -23,6 +24,9 @@ public class UserService implements UserUseCase {
     public User create(User user) {
         if(userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new EmailAlreadyExistException("Email already registered: " + user.getEmail());
+        }
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+            throw new RoleNotFoundException("Role is required");
         }
         if (user.getActive() == null) {
             user.setActive(true);

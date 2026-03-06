@@ -7,7 +7,9 @@ import com.ats.user.infrastructure.in.web.dto.response.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.Collections;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Mapper(componentModel = "spring", imports= LocalDateTime.class)
 public interface UserWebMapper {
@@ -23,6 +25,7 @@ public interface UserWebMapper {
     User toDomain(UserRequest request);
 
     @Mapping(target = "createdAt", source = "createdAt")
+    @Mapping(target = "roles", expression = "java(mapRoleNames(user))")
     UserResponse toResponse(User user);
 
     @Mapping(target = "id", ignore = true)
@@ -34,4 +37,14 @@ public interface UserWebMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
     User toDomain(UpdateUserRequest update);
+
+    default Set<String> mapRoleNames(User user) {
+        if (user == null || user.getRoles() == null || user.getRoles().isEmpty()) {
+            return Collections.emptySet();
+        }
+        return user.getRoles().stream()
+                .map(role -> role.getName())
+                .filter(name -> name != null && !name.isBlank())
+                .collect(java.util.stream.Collectors.toSet());
+    }
 }
