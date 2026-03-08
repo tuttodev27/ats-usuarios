@@ -1,33 +1,49 @@
 package com.ats.user.application.service;
 
+import com.ats.user.application.service.password.PasswordPolicy;
 import com.ats.user.domain.exception.EmailAlreadyExistException;
 import com.ats.user.domain.exception.RoleNotFoundException;
 import com.ats.user.domain.exception.UserNotFoundException;
 import com.ats.user.domain.model.User;
 import com.ats.user.domain.port.in.UserUseCase;
+import com.ats.user.domain.port.out.PasswordHasherPort;
+import com.ats.user.domain.port.out.RoleRepositoryPort;
 import com.ats.user.domain.port.out.UserRepositoryPort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService implements UserUseCase {
 
     public final UserRepositoryPort userRepository;
+    public final RoleRepositoryPort roleRepository;
+    public final PasswordHasherPort passwordHasher;
+    public final PasswordPolicy passwordPolicy;
 
-    public UserService(UserRepositoryPort userRepository) {
+    public UserService(UserRepositoryPort userRepository,
+                       RoleRepositoryPort roleRepository,
+                       PasswordHasherPort passwordHasher,
+                       PasswordPolicy passwordPolicy) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordHasher = passwordHasher;
+        this.passwordPolicy = passwordPolicy;
     }
 
     @Override
-    public User create(User user) {
+    public User create(User user, String roleName, String rawPassword) {
         if(userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new EmailAlreadyExistException("Email already registered: " + user.getEmail());
         }
-        if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            throw new RoleNotFoundException("Role is required");
-        }
+        passwordPolicy.validate(rawPassword);
+        var role = roleRepository.findActiveByName(roleName)
+                .orElseThrow(() -> new RoleNotFoundException("Active role not found: " + roleName));
+
+        user.setRoles(Set.of(role));
+        user.setPasswordHash(passwordHasher.encode(rawPassword));
         if (user.getActive() == null) {
             user.setActive(true);
         }
@@ -43,6 +59,11 @@ public class UserService implements UserUseCase {
     @Override
     public List<User> listActive() {
         return userRepository.findAllActive();
+    }
+
+    @Override
+    public List<String> listAvailableRoles() {
+        return roleRepository.listActiveRoleNames();
     }
 
     @Override

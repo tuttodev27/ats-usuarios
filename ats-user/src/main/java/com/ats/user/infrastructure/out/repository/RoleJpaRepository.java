@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RoleJpaRepository extends JpaRepository<RoleEntity, Long> {
+    boolean existsByNameIgnoreCase(String name);
+    Optional<RoleEntity> findByNameIgnoreCase(String name);
     Optional<RoleEntity> findByNameIgnoreCaseAndActiveTrue(String name);
     List<RoleEntity> findAllByActiveTrueOrderByNameAsc();
 }
