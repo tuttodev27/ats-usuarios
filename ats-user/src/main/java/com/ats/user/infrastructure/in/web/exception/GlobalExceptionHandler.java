@@ -2,6 +2,8 @@ package com.ats.user.infrastructure.in.web.exception;
 
 import com.ats.user.domain.exception.EmailAlreadyExistException;
 import com.ats.user.domain.exception.InvalidPasswordException;
+import com.ats.user.domain.exception.PermissionNotFoundException;
+import com.ats.user.domain.exception.RoleAlreadyExistsException;
 import com.ats.user.domain.exception.RoleNotFoundException;
 import com.ats.user.domain.exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,10 +50,31 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(RoleAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleRoleAlreadyExists(RoleAlreadyExistsException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                new ErrorResponse(Instant.now(), 409, "ROLE_ALREADY_EXISTS", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(PermissionNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePermissionNotFound(PermissionNotFoundException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ErrorResponse(Instant.now(), 404, "PERMISSION_NOT_FOUND", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<ErrorResponse> handleInvalidPassword(InvalidPasswordException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new ErrorResponse(Instant.now(), 400, "INVALID_PASSWORD", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ErrorResponse(Instant.now(), 400, "BAD_REQUEST", ex.getMessage(), request.getRequestURI())
         );
     }
 
