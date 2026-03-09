@@ -2,6 +2,7 @@ package com.ats.user.infrastructure.in.web.exception;
 
 import com.ats.user.domain.exception.EmailAlreadyExistException;
 import com.ats.user.domain.exception.InvalidPasswordException;
+import com.ats.user.domain.exception.PermissionNotFoundException;
 import com.ats.user.domain.exception.RoleAlreadyExistsException;
 import com.ats.user.domain.exception.RoleNotFoundException;
 import com.ats.user.domain.exception.UserNotFoundException;
@@ -53,6 +54,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRoleAlreadyExists(RoleAlreadyExistsException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 new ErrorResponse(Instant.now(), 409, "ROLE_ALREADY_EXISTS", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(PermissionNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePermissionNotFound(PermissionNotFoundException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ErrorResponse(Instant.now(), 404, "PERMISSION_NOT_FOUND", ex.getMessage(), request.getRequestURI())
         );
     }
 

@@ -1,22 +1,29 @@
 package com.ats.user.application.service;
 
+import com.ats.user.domain.exception.PermissionNotFoundException;
 import com.ats.user.domain.exception.RoleAlreadyExistsException;
 import com.ats.user.domain.exception.RoleNotFoundException;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.port.in.RoleUseCase;
+import com.ats.user.domain.port.out.PermissionRepositoryPort;
 import com.ats.user.domain.port.out.RoleRepositoryPort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class RoleService implements RoleUseCase {
 
     private final RoleRepositoryPort roleRepository;
+    private final PermissionRepositoryPort permissionRepository;
 
-    public RoleService(RoleRepositoryPort roleRepository) {
+    public RoleService(RoleRepositoryPort roleRepository,
+                       PermissionRepositoryPort permissionRepository) {
         this.roleRepository = roleRepository;
+        this.permissionRepository = permissionRepository;
     }
 
     @Override
@@ -70,6 +77,41 @@ public class RoleService implements RoleUseCase {
         current.setActive(false);
         current.setUpdatedAt(LocalDateTime.now());
         roleRepository.save(current);
+    }
+
+    @Override
+    public Role assignPermissions(Long roleId, List<Long> permissionIds) {
+        if (permissionIds == null) {
+            throw new IllegalArgumentException("Permission ids are required");
+        }
+
+        Set<Long> uniqueIds = new LinkedHashSet<>(permissionIds);
+        if (uniqueIds.isEmpty()) {
+            throw new IllegalArgumentException("At least one permission id is required");
+        }
+
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleId));
+
+        List<Long> normalizedIds = uniqueIds.stream().toList();
+        var permissions = permissionRepository.findAllByIds(normalizedIds);
+        if (permissions.size() != normalizedIds.size()) {
+            throw new PermissionNotFoundException("One or more permissions were not found");
+        }
+
+        role.getPermissions().clear();
+        permissions.forEach(role::addPermission);
+        role.setUpdatedAt(LocalDateTime.now());
+        return roleRepository.save(role);
+    }
+
+    @Override
+    public Role updateStatus(Long id, boolean active) {
+        Role current = roleRepository.findById(id)
+                .orElseThrow(() -> new RoleNotFoundException("Role not found: " + id));
+        current.setActive(active);
+        current.setUpdatedAt(LocalDateTime.now());
+        return roleRepository.save(current);
     }
 
     private String normalizeName(String roleName) {
