@@ -83,6 +83,16 @@ class UserServiceTest {
     }
 
     @Test
+    void createShouldFailWhenRoleIsInactive() {
+        User input = UserDumpData.domainUserCreate();
+        when(userRepository.findByEmail(input.getEmail())).thenReturn(Optional.empty());
+        when(roleRepository.findActiveByName("RECRUITER")).thenReturn(Optional.empty());
+
+        assertThrows(RoleNotFoundException.class, () -> userService.create(input, "RECRUITER", "Clave123"));
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
     void getByIdShouldReturnUserWhenExists() {
         User existing = UserDumpData.domainUserExisting();
         when(userRepository.findById(1L)).thenReturn(Optional.of(existing));
