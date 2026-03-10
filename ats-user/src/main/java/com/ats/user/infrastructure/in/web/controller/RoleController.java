@@ -217,4 +217,28 @@ public class RoleController {
         var updated = roleUseCase.updateStatus(id, request.active());
         return ResponseEntity.ok(roleWebMapper.toResponse(updated));
     }
+
+    @DeleteMapping("/{id}/permissions")
+    @Operation(
+            summary = "Quitar permisos de rol con borrado logico",
+            description = "Desactiva la relacion entre el rol y los permisos enviados."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Permisos desasignados logicamente",
+                    content = @Content(schema = @Schema(implementation = RolePermissionsResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Solicitud invalida",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "No autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Rol o permisos no encontrados",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<RolePermissionsResponse> deletePermissions(
+            @PathVariable Long id,
+            @Valid @RequestBody AssignPermissionRequest request
+    ) {
+        var updatedRole = roleUseCase.deletePermissions(id, request.permissionIds());
+        return ResponseEntity.ok(roleWebMapper.toPermissionsResponse(updatedRole));
+    }
+
 }

@@ -12,4 +12,5 @@ public interface RoleUseCase {
     void delete(Long id);
     Role assignPermissions(Long roleId, List<Long> permissionIds);
     Role updateStatus(Long id, boolean active);
+    Role deletePermissions(Long roleId, List<Long> permissionIds);
 }

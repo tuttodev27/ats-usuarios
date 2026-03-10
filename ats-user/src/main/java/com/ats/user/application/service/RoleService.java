@@ -10,6 +10,7 @@ import com.ats.user.domain.port.out.RoleRepositoryPort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -112,6 +113,23 @@ public class RoleService implements RoleUseCase {
         current.setActive(active);
         current.setUpdatedAt(LocalDateTime.now());
         return roleRepository.save(current);
+    }
+
+    @Override
+    public Role deletePermissions(Long roleId, List<Long> permissionIds) {
+        Role role= roleRepository.findById(roleId)
+                .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleId));
+        Set<Long> removeRole= new HashSet<>(permissionIds);
+        boolean changed= role.getPermissions().removeIf(p->removeRole.contains(p.getId()));
+        if(!changed) {
+            throw new PermissionNotFoundException(
+            "Permission " + permissionIds + " is not assigned to role " + roleId
+            );
+        }
+        role.setUpdatedAt(LocalDateTime.now());
+        return roleRepository.save(role);
+
+
     }
 
     private String normalizeName(String roleName) {

@@ -7,8 +7,8 @@ import com.ats.user.infrastructure.in.web.dto.response.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.Collections;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Set;
 
 @Mapper(componentModel = "spring", imports= LocalDateTime.class)
@@ -29,8 +29,8 @@ public interface UserWebMapper {
     UserResponse toResponse(User user);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "email", ignore = true)        // no cambiar email acá
-    @Mapping(target = "passwordHash", ignore = true) // no cambiar password acá
+    @Mapping(target = "email", ignore = true)
+    @Mapping(target = "passwordHash", ignore = true)
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", expression = "java(LocalDateTime.now())")
