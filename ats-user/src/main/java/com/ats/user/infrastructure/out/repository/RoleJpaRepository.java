@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RoleJpaRepository extends JpaRepository<RoleEntity, Long> {
-    @EntityGraph(attributePaths = "permissions")
+    @EntityGraph(attributePaths = {"rolePermissions", "rolePermissions.permission", "rolePermissions.permission.module"})
     Optional<RoleEntity> findWithPermissionsById(Long id);
 
-    @EntityGraph(attributePaths = "permissions")
+    @EntityGraph(attributePaths = {"rolePermissions", "rolePermissions.permission", "rolePermissions.permission.module"})
     List<RoleEntity> findAllByOrderByIdAsc();
 
     boolean existsByNameIgnoreCase(String name);

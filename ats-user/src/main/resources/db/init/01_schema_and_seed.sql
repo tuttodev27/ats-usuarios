@@ -79,10 +79,17 @@ CREATE TABLE IF NOT EXISTS user_roles (
 CREATE TABLE IF NOT EXISTS role_permissions (
     role_id BIGINT NOT NULL,
     permission_id BIGINT NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
     PRIMARY KEY (role_id, permission_id),
     CONSTRAINT fk_role_permissions_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
     CONSTRAINT fk_role_permissions_permission FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE
 );
+
+ALTER TABLE role_permissions ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE role_permissions ADD COLUMN IF NOT EXISTS created_at TIMESTAMP;
+ALTER TABLE role_permissions ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
 
 CREATE INDEX IF NOT EXISTS idx_module_code ON modules(code);
 CREATE INDEX IF NOT EXISTS idx_permission_code ON permissions(code);
@@ -159,19 +166,23 @@ ON CONFLICT (email) DO UPDATE SET
     updated_by = EXCLUDED.updated_by;
 
 -- Role-Permission mapping
-INSERT INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id
+INSERT INTO role_permissions (role_id, permission_id, active, created_at, updated_at)
+SELECT r.id, p.id, TRUE, NOW(), NOW()
 FROM roles r
 JOIN permissions p ON p.code IN ('USER_CREATE', 'USER_READ', 'USER_UPDATE', 'USER_DELETE', 'ATS_DASHBOARD_VIEW')
 WHERE r.name = 'ADMIN'
-ON CONFLICT DO NOTHING;
+ON CONFLICT (role_id, permission_id) DO UPDATE SET
+    active = TRUE,
+    updated_at = NOW();
 
-INSERT INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id
+INSERT INTO role_permissions (role_id, permission_id, active, created_at, updated_at)
+SELECT r.id, p.id, TRUE, NOW(), NOW()
 FROM roles r
 JOIN permissions p ON p.code IN ('USER_READ', 'ATS_DASHBOARD_VIEW')
 WHERE r.name = 'RECRUITER'
-ON CONFLICT DO NOTHING;
+ON CONFLICT (role_id, permission_id) DO UPDATE SET
+    active = TRUE,
+    updated_at = NOW();
 
 -- User-Role mapping
 INSERT INTO user_roles (user_id, role_id)
