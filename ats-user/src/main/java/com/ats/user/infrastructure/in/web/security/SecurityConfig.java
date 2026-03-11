@@ -1,10 +1,12 @@
 package com.ats.user.infrastructure.in.web.security;
 
 import com.ats.user.infrastructure.in.web.security.jwt.JwtAuthFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,7 +20,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -46,6 +47,14 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/roles").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/roles/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/roles/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/roles/*/permissions").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/roles/*/permissions").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/roles/*/status").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(eh -> eh
