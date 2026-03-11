@@ -48,6 +48,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
 	testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 	testAnnotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
