@@ -1,6 +1,9 @@
 package com.ats.user.infrastructure.in.web.security;
 
+import com.ats.user.infrastructure.out.entity.PermissionEntity;
 import com.ats.user.infrastructure.out.entity.RoleEntity;
+import com.ats.user.infrastructure.out.entity.RolePermissionEntity;
+import com.ats.user.infrastructure.out.entity.RolePermissionId;
 import com.ats.user.infrastructure.out.entity.UserEntity;
 import com.ats.user.infrastructure.out.repository.UserJpaRepository;
 import com.ats.user.support.UserDumpData;
@@ -47,6 +50,50 @@ class AuthUserDetailsServiceTest {
     }
 
     @Test
+    void loadUserByUsernameShouldIncludeActivePermissionAuthorities() {
+        RoleEntity admin = UserDumpData.entityRole("ADMIN", true);
+        PermissionEntity createUser = permissionEntity(1L, "USER_CREATE", true);
+        PermissionEntity readUser = permissionEntity(2L, "USER_READ", true);
+
+        admin.setRolePermissions(Set.of(
+                rolePermission(admin, createUser, true),
+                rolePermission(admin, readUser, true)
+        ));
+
+        UserEntity userEntity = UserDumpData.entityUserForAuth(true, Set.of(admin));
+        when(userRepository.findByEmail("admin@ats.local")).thenReturn(java.util.Optional.of(userEntity));
+
+        UserDetails userDetails = authUserDetailsService.loadUserByUsername("admin@ats.local");
+
+        assertTrue(userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
+        assertTrue(userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("USER_CREATE")));
+        assertTrue(userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("USER_READ")));
+    }
+
+    @Test
+    void loadUserByUsernameShouldIgnoreInactiveOrLogicallyDeletedPermissions() {
+        RoleEntity admin = UserDumpData.entityRole("ADMIN", true);
+        PermissionEntity activePermission = permissionEntity(1L, "USER_CREATE", true);
+        PermissionEntity inactivePermission = permissionEntity(2L, "USER_DELETE", false);
+        PermissionEntity logicallyDeletedPermission = permissionEntity(3L, "USER_UPDATE", true);
+
+        admin.setRolePermissions(Set.of(
+                rolePermission(admin, activePermission, true),
+                rolePermission(admin, inactivePermission, true),
+                rolePermission(admin, logicallyDeletedPermission, false)
+        ));
+
+        UserEntity userEntity = UserDumpData.entityUserForAuth(true, Set.of(admin));
+        when(userRepository.findByEmail("admin@ats.local")).thenReturn(java.util.Optional.of(userEntity));
+
+        UserDetails userDetails = authUserDetailsService.loadUserByUsername("admin@ats.local");
+
+        assertTrue(userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("USER_CREATE")));
+        assertFalse(userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("USER_DELETE")));
+        assertFalse(userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("USER_UPDATE")));
+    }
+
+    @Test
     void loadUserByUsernameShouldFallbackToRoleUserWhenNoActiveRoles() {
         RoleEntity inactiveRole = UserDumpData.entityRole("ADMIN", false);
         UserEntity userEntity = UserDumpData.entityUserForAuth(true, Set.of(inactiveRole));
@@ -75,5 +122,22 @@ class AuthUserDetailsServiceTest {
 
         assertThrows(UsernameNotFoundException.class,
                 () -> authUserDetailsService.loadUserByUsername("notfound@ats.local"));
+    }
+
+    private PermissionEntity permissionEntity(Long id, String code, boolean active) {
+        return PermissionEntity.builder()
+                .id(id)
+                .code(code)
+                .active(active)
+                .build();
+    }
+
+    private RolePermissionEntity rolePermission(RoleEntity role, PermissionEntity permission, boolean active) {
+        return RolePermissionEntity.builder()
+                .id(new RolePermissionId(role.getId(), permission.getId()))
+                .role(role)
+                .permission(permission)
+                .active(active)
+                .build();
     }
 }
