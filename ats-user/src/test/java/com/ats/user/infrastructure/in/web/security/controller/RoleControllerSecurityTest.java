@@ -19,7 +19,6 @@ import java.util.HashSet;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -67,8 +66,8 @@ public class RoleControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "recruiter@ats.local", roles = {"RECRUITER"})
-    void createRoleShouldReturn403WhenRoleIsNotAdmin() throws Exception {
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_UPDATE"})
+    void createRoleShouldReturn403WhenUserDoesNotHaveCreatePermission() throws Exception {
         mockMvc.perform(post("/api/roles")
                         .contentType(APPLICATION_JSON)
                         .content(validCreateRoleRequestJson()))
@@ -77,8 +76,8 @@ public class RoleControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", roles = {"ADMIN"})
-    void createRoleShouldReturn201WhenRoleIsAdmin() throws Exception {
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_CREATE"})
+    void createRoleShouldReturn201WhenUserHasCreatePermission() throws Exception {
         when(roleUseCase.create(any(Role.class))).thenReturn(sampleRole());
 
         mockMvc.perform(post("/api/roles")
@@ -89,8 +88,8 @@ public class RoleControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "recruiter@ats.local", roles = {"RECRUITER"})
-    void updateRoleShouldReturn403WhenRoleIsNotAdmin() throws Exception {
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_CREATE"})
+    void updateRoleShouldReturn403WhenUserDoesNotHaveUpdatePermission() throws Exception {
         mockMvc.perform(put("/api/roles/1")
                         .contentType(APPLICATION_JSON)
                         .content(validUpdateRoleRequestJson()))
@@ -99,8 +98,8 @@ public class RoleControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", roles = {"ADMIN"})
-    void updateRoleShouldReturn200WhenRoleIsAdmin() throws Exception {
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_UPDATE"})
+    void updateRoleShouldReturn200WhenUserHasUpdatePermission() throws Exception {
         when(roleUseCase.update(anyLong(), any(Role.class))).thenReturn(sampleRole());
 
         mockMvc.perform(put("/api/roles/1")
@@ -118,23 +117,23 @@ public class RoleControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "recruiter@ats.local", roles = {"RECRUITER"})
-    void deleteRoleShouldReturn403WhenRoleIsNotAdmin() throws Exception {
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_UPDATE"})
+    void deleteRoleShouldReturn403WhenUserDoesNotHaveDeletePermission() throws Exception {
         mockMvc.perform(delete("/api/roles/1"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", roles = {"ADMIN"})
-    void deleteRoleShouldReturn204WhenRoleIsAdmin() throws Exception {
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_DELETE"})
+    void deleteRoleShouldReturn204WhenUserHasDeletePermission() throws Exception {
         mockMvc.perform(delete("/api/roles/1"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    @WithMockUser(username = "recruiter@ats.local", roles = {"RECRUITER"})
-    void assignPermissionsShouldReturn403WhenRoleIsNotAdmin() throws Exception {
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_UPDATE"})
+    void assignPermissionsShouldReturn403WhenUserDoesNotHaveAssignPermission() throws Exception {
         mockMvc.perform(put("/api/roles/1/permissions")
                         .contentType(APPLICATION_JSON)
                         .content(validPermissionRequestJson()))
@@ -143,9 +142,9 @@ public class RoleControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", roles = {"ADMIN"})
-    void assignPermissionsShouldReturn200WhenRoleIsAdmin() throws Exception {
-        when(roleUseCase.assignPermissions(anyLong(), anyList())).thenReturn(sampleRole());
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_PERMISSION_ASSIGN"})
+    void assignPermissionsShouldReturn200WhenUserHasAssignPermission() throws Exception {
+        when(roleUseCase.assignPermissions(anyLong(), any())).thenReturn(sampleRole());
 
         mockMvc.perform(put("/api/roles/1/permissions")
                         .contentType(APPLICATION_JSON)
@@ -155,8 +154,8 @@ public class RoleControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "recruiter@ats.local", roles = {"RECRUITER"})
-    void deletePermissionsShouldReturn403WhenRoleIsNotAdmin() throws Exception {
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_DELETE"})
+    void deletePermissionsShouldReturn403WhenUserDoesNotHaveRemovePermission() throws Exception {
         mockMvc.perform(delete("/api/roles/1/permissions")
                         .contentType(APPLICATION_JSON)
                         .content(validPermissionRequestJson()))
@@ -165,9 +164,9 @@ public class RoleControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", roles = {"ADMIN"})
-    void deletePermissionsShouldReturn200WhenRoleIsAdmin() throws Exception {
-        when(roleUseCase.deletePermissions(anyLong(), anyList())).thenReturn(sampleRole());
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_PERMISSION_REMOVE"})
+    void deletePermissionsShouldReturn200WhenUserHasRemovePermission() throws Exception {
+        when(roleUseCase.deletePermissions(anyLong(), any())).thenReturn(sampleRole());
 
         mockMvc.perform(delete("/api/roles/1/permissions")
                         .contentType(APPLICATION_JSON)
@@ -177,8 +176,8 @@ public class RoleControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "recruiter@ats.local", roles = {"RECRUITER"})
-    void updateStatusShouldReturn403WhenRoleIsNotAdmin() throws Exception {
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_UPDATE"})
+    void updateStatusShouldReturn403WhenUserDoesNotHaveStatusUpdatePermission() throws Exception {
         mockMvc.perform(patch("/api/roles/1/status")
                         .contentType(APPLICATION_JSON)
                         .content(validStatusRequestJson()))
@@ -187,8 +186,8 @@ public class RoleControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", roles = {"ADMIN"})
-    void updateStatusShouldReturn200WhenRoleIsAdmin() throws Exception {
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_STATUS_UPDATE"})
+    void updateStatusShouldReturn200WhenUserHasStatusUpdatePermission() throws Exception {
         when(roleUseCase.updateStatus(anyLong(), anyBoolean())).thenReturn(sampleRole());
 
         mockMvc.perform(patch("/api/roles/1/status")
