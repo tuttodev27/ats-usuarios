@@ -118,6 +118,13 @@ VALUES
     ('USER_READ',   'users', 'read',   'global', 'Consultar usuario', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
     ('USER_UPDATE', 'users', 'update', 'global', 'Actualizar usuario', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
     ('USER_DELETE', 'users', 'delete', 'global', 'Desactivar usuario', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
+    ('ROLE_CREATE', 'roles', 'create', 'global', 'Crear rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
+    ('ROLE_READ', 'roles', 'read', 'global', 'Consultar rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
+    ('ROLE_UPDATE', 'roles', 'update', 'global', 'Actualizar rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
+    ('ROLE_DELETE', 'roles', 'delete', 'global', 'Desactivar rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
+    ('ROLE_STATUS_UPDATE', 'roles', 'status-update', 'global', 'Actualizar estado de rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
+    ('ROLE_PERMISSION_ASSIGN', 'role-permissions', 'assign', 'global', 'Asignar permisos a rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
+    ('ROLE_PERMISSION_REMOVE', 'role-permissions', 'remove', 'global', 'Quitar permisos de rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
     ('ATS_DASHBOARD_VIEW', 'dashboard', 'read', 'global', 'Ver dashboard ATS', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS'))
 ON CONFLICT (code) DO UPDATE SET
     resource = EXCLUDED.resource,
@@ -169,7 +176,20 @@ ON CONFLICT (email) DO UPDATE SET
 INSERT INTO role_permissions (role_id, permission_id, active, created_at, updated_at)
 SELECT r.id, p.id, TRUE, NOW(), NOW()
 FROM roles r
-JOIN permissions p ON p.code IN ('USER_CREATE', 'USER_READ', 'USER_UPDATE', 'USER_DELETE', 'ATS_DASHBOARD_VIEW')
+JOIN permissions p ON p.code IN (
+    'USER_CREATE',
+    'USER_READ',
+    'USER_UPDATE',
+    'USER_DELETE',
+    'ROLE_CREATE',
+    'ROLE_READ',
+    'ROLE_UPDATE',
+    'ROLE_DELETE',
+    'ROLE_STATUS_UPDATE',
+    'ROLE_PERMISSION_ASSIGN',
+    'ROLE_PERMISSION_REMOVE',
+    'ATS_DASHBOARD_VIEW'
+)
 WHERE r.name = 'ADMIN'
 ON CONFLICT (role_id, permission_id) DO UPDATE SET
     active = TRUE,
