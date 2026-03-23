@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -75,6 +77,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new ErrorResponse(Instant.now(), 400, "BAD_REQUEST", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                new ErrorResponse(Instant.now(), 401, "INVALID_CREDENTIALS", "Invalid email or password", request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ErrorResponse> handleDisabledUser(DisabledException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                new ErrorResponse(Instant.now(), 403, "USER_INACTIVE", "User account is inactive", request.getRequestURI())
         );
     }
 
