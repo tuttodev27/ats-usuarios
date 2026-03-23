@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -84,6 +85,56 @@ public class RoleControllerSecurityTest {
                         .contentType(APPLICATION_JSON)
                         .content(validCreateRoleRequestJson()))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("SUPERVISOR"));
+    }
+
+    @Test
+    void listRolesShouldReturn401WhenUnauthenticated() throws Exception {
+        mockMvc.perform(get("/api/roles"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+    }
+
+    @Test
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_UPDATE"})
+    void listRolesShouldReturn403WhenUserDoesNotHaveReadPermission() throws Exception {
+        mockMvc.perform(get("/api/roles"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+    }
+
+    @Test
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_READ"})
+    void listRolesShouldReturn200WhenUserHasReadPermission() throws Exception {
+        when(roleUseCase.list()).thenReturn(java.util.List.of(sampleRole()));
+
+        mockMvc.perform(get("/api/roles"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("SUPERVISOR"));
+    }
+
+    @Test
+    void getRoleByIdShouldReturn401WhenUnauthenticated() throws Exception {
+        mockMvc.perform(get("/api/roles/1"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+    }
+
+    @Test
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_UPDATE"})
+    void getRoleByIdShouldReturn403WhenUserDoesNotHaveReadPermission() throws Exception {
+        mockMvc.perform(get("/api/roles/1"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+    }
+
+    @Test
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_READ"})
+    void getRoleByIdShouldReturn200WhenUserHasReadPermission() throws Exception {
+        when(roleUseCase.getById(1L)).thenReturn(sampleRole());
+
+        mockMvc.perform(get("/api/roles/1"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("SUPERVISOR"));
     }
 
