@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,9 +50,9 @@ public class UserController {
         return ResponseEntity.ok(userWebMapper.toResponse(user));
     }
     @GetMapping
-    @Operation(summary = "Listar usuarios activos")
-    public ResponseEntity<List<UserResponse>> listActive() {
-        List<UserResponse> responses = userUseCase.listActive()
+    @Operation(summary = "Listar usuarios")
+    public ResponseEntity<List<UserResponse>> listUsers(@RequestParam(required = false) Boolean active) {
+        List<UserResponse> responses = userUseCase.listUsers(active)
                 .stream()
                 .map(userWebMapper::toResponse)
                 .toList();

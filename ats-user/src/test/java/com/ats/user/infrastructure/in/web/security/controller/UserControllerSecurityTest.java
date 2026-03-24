@@ -105,10 +105,21 @@ class UserControllerSecurityTest {
     @Test
     @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_READ"})
     void listUsersShouldReturn200WhenUserHasReadPermission() throws Exception {
-        when(userUseCase.listActive()).thenReturn(List.of(UserDumpData.domainUserExisting()));
+        when(userUseCase.listUsers(null)).thenReturn(List.of(UserDumpData.domainUserExisting()));
 
         mockMvc.perform(get("/api/users"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].active").value(true));
+    }
+
+    @Test
+    @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_READ"})
+    void listUsersShouldReturn200WhenFilteringActiveUsers() throws Exception {
+        when(userUseCase.listUsers(true)).thenReturn(List.of(UserDumpData.domainUserExisting()));
+
+        mockMvc.perform(get("/api/users").param("active", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].active").value(true));
     }
 
     @Test

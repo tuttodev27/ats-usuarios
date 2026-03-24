@@ -110,12 +110,23 @@ class UserServiceTest {
     }
 
     @Test
-    void listActiveShouldReturnDumpUsers() {
-        when(userRepository.findAllActive()).thenReturn(List.of(UserDumpData.domainUserExisting()));
-        List<User> users = userService.listActive();
+    void listUsersShouldReturnAllWhenFilterIsNull() {
+        when(userRepository.findAll()).thenReturn(List.of(UserDumpData.domainUserExisting()));
+        List<User> users = userService.listUsers(null);
 
         assertEquals(1, users.size());
         assertEquals("admin@ats.local", users.get(0).getEmail());
+    }
+
+    @Test
+    void listUsersShouldReturnOnlyActiveWhenFilterIsTrue() {
+        when(userRepository.findAllByActive(true)).thenReturn(List.of(UserDumpData.domainUserExisting()));
+
+        List<User> users = userService.listUsers(true);
+
+        assertEquals(1, users.size());
+        assertEquals("admin@ats.local", users.get(0).getEmail());
+        verify(userRepository).findAllByActive(true);
     }
 
     @Test
