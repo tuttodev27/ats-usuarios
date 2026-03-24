@@ -162,6 +162,14 @@ class RoleServiceTest {
     }
 
     @Test
+    void updateStatusShouldThrowWhenRoleDoesNotExist() {
+        when(roleRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(RoleNotFoundException.class, () -> roleService.updateStatus(99L, false));
+        verify(roleRepository, never()).save(any());
+    }
+
+    @Test
     void deletePermissionsShouldRemovePermissionsFromVisibleRoleAndSave() {
         Role role = roleExisting(1L, "ADMIN", true);
         role.setPermissions(new HashSet<>(Set.of(
