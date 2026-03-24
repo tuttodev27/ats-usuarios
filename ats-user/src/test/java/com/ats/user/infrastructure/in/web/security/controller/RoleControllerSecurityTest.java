@@ -20,6 +20,7 @@ import java.util.HashSet;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.ats.user.domain.exception.RoleNotFoundException;
 
 @SpringBootTest(
         classes = AtsUserApplication.class,
@@ -246,6 +248,19 @@ public class RoleControllerSecurityTest {
                         .content(validStatusRequestJson()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("SUPERVISOR"));
+    }
+
+    @Test
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_STATUS_UPDATE"})
+    void updateStatusShouldReturn404WhenRoleDoesNotExist() throws Exception {
+        when(roleUseCase.updateStatus(99L, false))
+                .thenThrow(new RoleNotFoundException("Role not found: 99"));
+
+        mockMvc.perform(patch("/api/roles/99/status")
+                        .contentType(APPLICATION_JSON)
+                        .content(validStatusRequestJson()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("ROLE_NOT_FOUND"));
     }
 
     private Role sampleRole() {
