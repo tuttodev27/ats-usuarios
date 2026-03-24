@@ -10,6 +10,7 @@ public record UserResponse(
         String email,
         String countryCode,
         String phone,
+        Boolean active,
         LocalDateTime createdAt,
         Set<String> roles
 ) {

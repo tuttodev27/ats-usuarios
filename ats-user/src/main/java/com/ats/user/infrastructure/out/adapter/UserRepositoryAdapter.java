@@ -41,8 +41,15 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public List<User> findAllActive() {
-        return userJpaRepository.findAllByActiveTrue().stream()
+    public List<User> findAll() {
+        return userJpaRepository.findAll().stream()
+                .map(userMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<User> findAllByActive(boolean active) {
+        return userJpaRepository.findAllByActive(active).stream()
                 .map(userMapper::toDomain)
                 .toList();
     }

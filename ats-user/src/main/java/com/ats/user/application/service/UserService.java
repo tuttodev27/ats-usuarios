@@ -57,8 +57,11 @@ public class UserService implements UserUseCase {
     }
 
     @Override
-    public List<User> listActive() {
-        return userRepository.findAllActive();
+    public List<User> listUsers(Boolean active) {
+        if (active == null) {
+            return userRepository.findAll();
+        }
+        return userRepository.findAllByActive(active);
     }
 
     @Override
