@@ -91,7 +91,7 @@ public class RoleController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rol encontrado",
                     content = @Content(schema = @Schema(implementation = RoleResponse.class))),
-            @ApiResponse(responseCode = "400", description = "ID invalido o rol no encontrado",
+            @ApiResponse(responseCode = "404", description = "Rol no encontrado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "No autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -112,7 +112,9 @@ public class RoleController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rol actualizado",
                     content = @Content(schema = @Schema(implementation = RoleResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Datos invalidos o rol no encontrado",
+            @ApiResponse(responseCode = "400", description = "Datos invalidos",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Rol no encontrado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "No autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -149,7 +151,7 @@ public class RoleController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Rol eliminado logicamente"),
-            @ApiResponse(responseCode = "400", description = "ID invalido o rol no encontrado",
+            @ApiResponse(responseCode = "404", description = "Rol no encontrado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "No autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -207,6 +209,8 @@ public class RoleController {
             @ApiResponse(responseCode = "200", description = "Estado del rol actualizado",
                     content = @Content(schema = @Schema(implementation = RoleResponse.class))),
             @ApiResponse(responseCode = "400", description = "Solicitud invalida",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Rol no encontrado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "No autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
