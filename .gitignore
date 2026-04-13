@@ -1,4 +1,5 @@
 .idea/
 ats-user/.gradle/
 ats-user/.gradle-local/
+ats-user/bin/
 ats-user/build/
