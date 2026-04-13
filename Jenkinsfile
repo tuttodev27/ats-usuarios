@@ -12,16 +12,9 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                echo 'Clonando repositorio ats-usuarios'
-                git branch: 'feature/develop', url: 'https://github.com/tuttodev27/ats-usuarios.git'
-            }
-        }
-
         stage('Prepare') {
             steps {
-                echo 'Dando permisos a gradlew'
+                echo 'Usando el checkout provisto por Jenkins y dando permisos a gradlew'
                 dir("${APP_DIR}") {
                     sh 'chmod +x gradlew'
                 }
