@@ -1,0 +1,16 @@
+package com.ats.user.infrastructure.in.web.dto.response;
+
+import java.time.LocalDateTime;
+
+public record MenuResponse(
+        Long id,
+        String title,
+        String path,
+        Long moduleId,
+        Integer orderIndex,
+        String requiredPermissionCode,
+        boolean active,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+) {
+}

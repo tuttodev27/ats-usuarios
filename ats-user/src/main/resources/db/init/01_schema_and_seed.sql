@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS menus (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(120) NOT NULL,
-    path VARCHAR(200) NOT NULL,
+    path VARCHAR(200) NOT NULL UNIQUE,
     order_index INTEGER,
     required_permission_code VARCHAR(120),
     active BOOLEAN NOT NULL,
@@ -97,7 +97,7 @@ CREATE INDEX IF NOT EXISTS idx_permission_module_id ON permissions(module_id);
 CREATE INDEX IF NOT EXISTS idx_role_name ON roles(name);
 CREATE INDEX IF NOT EXISTS idx_user_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_menu_module_id ON menus(module_id);
-CREATE INDEX IF NOT EXISTS idx_menu_path ON menus(path);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_menu_path ON menus(path);
 
 -- Modules
 INSERT INTO modules (code, name, description, active, created_at, updated_at, created_by, updated_by)
@@ -125,6 +125,15 @@ VALUES
     ('ROLE_STATUS_UPDATE', 'roles', 'status-update', 'global', 'Actualizar estado de rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
     ('ROLE_PERMISSION_ASSIGN', 'role-permissions', 'assign', 'global', 'Asignar permisos a rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
     ('ROLE_PERMISSION_REMOVE', 'role-permissions', 'remove', 'global', 'Quitar permisos de rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
+    ('MODULE_CREATE', 'modules', 'create', 'global', 'Crear modulo', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('MODULE_READ', 'modules', 'read', 'global', 'Consultar modulos', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('MODULE_UPDATE', 'modules', 'update', 'global', 'Actualizar modulo', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('MODULE_DELETE', 'modules', 'delete', 'global', 'Desactivar modulo', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('MENU_CREATE', 'menus', 'create', 'global', 'Crear menu', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('MENU_READ', 'menus', 'read', 'global', 'Consultar menus', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('MENU_UPDATE', 'menus', 'update', 'global', 'Actualizar menu', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('MENU_DELETE', 'menus', 'delete', 'global', 'Desactivar menu', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('PERMISSION_READ', 'permissions', 'read', 'global', 'Consultar catalogo de permisos', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
     ('ATS_DASHBOARD_VIEW', 'dashboard', 'read', 'global', 'Ver dashboard ATS', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS'))
 ON CONFLICT (code) DO UPDATE SET
     resource = EXCLUDED.resource,
@@ -152,7 +161,13 @@ VALUES
     ('Usuarios', '/users', 1, 'USER_READ', TRUE, NOW(), NOW(), (SELECT id FROM modules WHERE code = 'USER')),
     ('Nuevo Usuario', '/users/new', 2, 'USER_CREATE', TRUE, NOW(), NOW(), (SELECT id FROM modules WHERE code = 'USER')),
     ('Dashboard', '/dashboard', 1, 'ATS_DASHBOARD_VIEW', TRUE, NOW(), NOW(), (SELECT id FROM modules WHERE code = 'ATS'))
-ON CONFLICT DO NOTHING;
+ON CONFLICT (path) DO UPDATE SET
+    title = EXCLUDED.title,
+    order_index = EXCLUDED.order_index,
+    required_permission_code = EXCLUDED.required_permission_code,
+    active = EXCLUDED.active,
+    updated_at = NOW(),
+    module_id = EXCLUDED.module_id;
 
 -- Users
 -- Passwords:
@@ -188,6 +203,15 @@ JOIN permissions p ON p.code IN (
     'ROLE_STATUS_UPDATE',
     'ROLE_PERMISSION_ASSIGN',
     'ROLE_PERMISSION_REMOVE',
+    'MODULE_CREATE',
+    'MODULE_READ',
+    'MODULE_UPDATE',
+    'MODULE_DELETE',
+    'MENU_CREATE',
+    'MENU_READ',
+    'MENU_UPDATE',
+    'MENU_DELETE',
+    'PERMISSION_READ',
     'ATS_DASHBOARD_VIEW'
 )
 WHERE r.name = 'ADMIN'
@@ -198,11 +222,20 @@ ON CONFLICT (role_id, permission_id) DO UPDATE SET
 INSERT INTO role_permissions (role_id, permission_id, active, created_at, updated_at)
 SELECT r.id, p.id, TRUE, NOW(), NOW()
 FROM roles r
-JOIN permissions p ON p.code IN ('USER_READ', 'ATS_DASHBOARD_VIEW')
+JOIN permissions p ON p.code IN ('ATS_DASHBOARD_VIEW')
 WHERE r.name = 'RECRUITER'
 ON CONFLICT (role_id, permission_id) DO UPDATE SET
     active = TRUE,
     updated_at = NOW();
+
+UPDATE role_permissions rp
+SET active = FALSE,
+    updated_at = NOW()
+FROM roles r, permissions p
+WHERE rp.role_id = r.id
+  AND rp.permission_id = p.id
+  AND r.name = 'RECRUITER'
+  AND p.code = 'USER_READ';
 
 -- User-Role mapping
 INSERT INTO user_roles (user_id, role_id)

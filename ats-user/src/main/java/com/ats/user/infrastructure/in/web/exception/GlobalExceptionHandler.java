@@ -2,6 +2,10 @@ package com.ats.user.infrastructure.in.web.exception;
 
 import com.ats.user.domain.exception.EmailAlreadyExistException;
 import com.ats.user.domain.exception.InvalidPasswordException;
+import com.ats.user.domain.exception.MenuAlreadyExistsException;
+import com.ats.user.domain.exception.MenuNotFoundException;
+import com.ats.user.domain.exception.ModuleAlreadyExistsException;
+import com.ats.user.domain.exception.ModuleNotFoundException;
 import com.ats.user.domain.exception.PermissionNotFoundException;
 import com.ats.user.domain.exception.RoleAlreadyExistsException;
 import com.ats.user.domain.exception.RoleNotFoundException;
@@ -56,6 +60,34 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRoleAlreadyExists(RoleAlreadyExistsException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 new ErrorResponse(Instant.now(), 409, "ROLE_ALREADY_EXISTS", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(ModuleNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleModuleNotFound(ModuleNotFoundException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ErrorResponse(Instant.now(), 404, "MODULE_NOT_FOUND", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(ModuleAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleModuleAlreadyExists(ModuleAlreadyExistsException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                new ErrorResponse(Instant.now(), 409, "MODULE_ALREADY_EXISTS", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(MenuNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleMenuNotFound(MenuNotFoundException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ErrorResponse(Instant.now(), 404, "MENU_NOT_FOUND", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(MenuAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleMenuAlreadyExists(MenuAlreadyExistsException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                new ErrorResponse(Instant.now(), 409, "MENU_ALREADY_EXISTS", ex.getMessage(), request.getRequestURI())
         );
     }
 

@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface PermissionRepositoryPort {
     List<Permission> findAllByIds(List<Long> ids);
+    List<Permission> findAll();
 }

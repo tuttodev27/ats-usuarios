@@ -40,7 +40,7 @@ public class MenuEntity {
     @Column(nullable = false, length = 120)
     String title;
 
-    @Column(nullable = false, length = 200)
+    @Column(nullable = false, length = 200, unique = true)
     String path;
 
     @Column(name = "order_index")

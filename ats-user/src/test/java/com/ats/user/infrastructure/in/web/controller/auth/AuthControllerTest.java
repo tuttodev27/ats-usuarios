@@ -1,6 +1,8 @@
 package com.ats.user.infrastructure.in.web.controller.auth;
 
 import com.ats.user.AtsUserApplication;
+import com.ats.user.infrastructure.out.repository.MenuJpaRepository;
+import com.ats.user.infrastructure.out.repository.ModuleJpaRepository;
 import com.ats.user.infrastructure.out.repository.PermissionJpaRepository;
 import com.ats.user.infrastructure.out.repository.RoleJpaRepository;
 import com.ats.user.infrastructure.out.repository.UserJpaRepository;
@@ -55,6 +57,12 @@ class AuthControllerTest {
 
     @MockitoBean
     private PermissionJpaRepository permissionJpaRepository;
+
+    @MockitoBean
+    private ModuleJpaRepository moduleJpaRepository;
+
+    @MockitoBean
+    private MenuJpaRepository menuJpaRepository;
 
     @Test
     void loginShouldReturn200AndJwtWhenCredentialsAreValid() throws Exception {

@@ -64,6 +64,20 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/roles/*/permissions").hasAuthority("ROLE_PERMISSION_ASSIGN")
                         .requestMatchers(HttpMethod.DELETE, "/api/roles/*/permissions").hasAuthority("ROLE_PERMISSION_REMOVE")
 
+                        .requestMatchers(HttpMethod.POST, "/api/modules").hasAuthority("MODULE_CREATE")
+                        .requestMatchers(HttpMethod.GET, "/api/modules").hasAuthority("MODULE_READ")
+                        .requestMatchers(HttpMethod.GET, "/api/modules/*").hasAuthority("MODULE_READ")
+                        .requestMatchers(HttpMethod.PUT, "/api/modules/*").hasAuthority("MODULE_UPDATE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/modules/*").hasAuthority("MODULE_DELETE")
+
+                        .requestMatchers(HttpMethod.POST, "/api/menus").hasAuthority("MENU_CREATE")
+                        .requestMatchers(HttpMethod.GET, "/api/menus").hasAuthority("MENU_READ")
+                        .requestMatchers(HttpMethod.GET, "/api/menus/*").hasAuthority("MENU_READ")
+                        .requestMatchers(HttpMethod.PUT, "/api/menus/*").hasAuthority("MENU_UPDATE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/menus/*").hasAuthority("MENU_DELETE")
+
+                        .requestMatchers(HttpMethod.GET, "/api/permissions").hasAuthority("PERMISSION_READ")
+
                         .anyRequest().authenticated()
                 )
 

@@ -4,6 +4,8 @@ import com.ats.user.AtsUserApplication;
 import com.ats.user.domain.exception.PermissionNotFoundException;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.port.in.RoleUseCase;
+import com.ats.user.infrastructure.out.repository.MenuJpaRepository;
+import com.ats.user.infrastructure.out.repository.ModuleJpaRepository;
 import com.ats.user.infrastructure.out.repository.PermissionJpaRepository;
 import com.ats.user.infrastructure.out.repository.RoleJpaRepository;
 import com.ats.user.infrastructure.out.repository.UserJpaRepository;
@@ -59,6 +61,12 @@ public class RoleControllerSecurityTest {
 
     @MockitoBean
     private PermissionJpaRepository permissionJpaRepository;
+
+    @MockitoBean
+    private ModuleJpaRepository moduleJpaRepository;
+
+    @MockitoBean
+    private MenuJpaRepository menuJpaRepository;
 
     @Test
     void createRoleShouldReturn401WhenUnauthenticated() throws Exception {
