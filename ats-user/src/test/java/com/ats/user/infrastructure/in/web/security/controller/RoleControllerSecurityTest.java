@@ -1,6 +1,7 @@
 package com.ats.user.infrastructure.in.web.security.controller;
 
 import com.ats.user.AtsUserApplication;
+import com.ats.user.domain.exception.PermissionNotFoundException;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.port.in.RoleUseCase;
 import com.ats.user.infrastructure.out.repository.PermissionJpaRepository;
@@ -185,6 +186,15 @@ public class RoleControllerSecurityTest {
     }
 
     @Test
+    void assignPermissionsShouldReturn401WhenUnauthenticated() throws Exception {
+        mockMvc.perform(put("/api/roles/1/permissions")
+                        .contentType(APPLICATION_JSON)
+                        .content(validPermissionRequestJson()))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+    }
+
+    @Test
     @WithMockUser(username = "user@ats.local", authorities = {"ROLE_UPDATE"})
     void assignPermissionsShouldReturn403WhenUserDoesNotHaveAssignPermission() throws Exception {
         mockMvc.perform(put("/api/roles/1/permissions")
@@ -204,6 +214,46 @@ public class RoleControllerSecurityTest {
                         .content(validPermissionRequestJson()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.roleName").value("SUPERVISOR"));
+    }
+
+    @Test
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_PERMISSION_ASSIGN"})
+    void assignPermissionsShouldReturn400WhenRequestDoesNotIncludePermissions() throws Exception {
+        mockMvc.perform(put("/api/roles/1/permissions")
+                        .contentType(APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "permissionIds": []
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_PERMISSION_ASSIGN"})
+    void assignPermissionsShouldReturn404WhenRoleDoesNotExist() throws Exception {
+        when(roleUseCase.assignPermissions(99L, java.util.List.of(1L, 2L)))
+                .thenThrow(new RoleNotFoundException("Role not found: 99"));
+
+        mockMvc.perform(put("/api/roles/99/permissions")
+                        .contentType(APPLICATION_JSON)
+                        .content(validPermissionRequestJson()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("ROLE_NOT_FOUND"));
+    }
+
+    @Test
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_PERMISSION_ASSIGN"})
+    void assignPermissionsShouldReturn404WhenAnyPermissionDoesNotExist() throws Exception {
+        when(roleUseCase.assignPermissions(1L, java.util.List.of(1L, 2L)))
+                .thenThrow(new PermissionNotFoundException("One or more permissions were not found"));
+
+        mockMvc.perform(put("/api/roles/1/permissions")
+                        .contentType(APPLICATION_JSON)
+                        .content(validPermissionRequestJson()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("PERMISSION_NOT_FOUND"));
     }
 
     @Test
