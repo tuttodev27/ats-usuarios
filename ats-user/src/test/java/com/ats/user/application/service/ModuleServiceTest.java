@@ -93,7 +93,6 @@ class ModuleServiceTest {
         assertEquals("ATS-REQUEST", updated.getCode());
         assertEquals("ATS Request", updated.getName());
         assertEquals("Nuevo modulo", updated.getDescription());
-        assertFalse(updated.isActive());
         assertNotNull(updated.getUpdatedAt());
     }
 
@@ -112,6 +111,26 @@ class ModuleServiceTest {
 
         assertThrows(ModuleAlreadyExistsException.class, () -> moduleService.updateModule(1L, updateInput));
         verify(moduleRepository, never()).save(any());
+    }
+
+    @Test
+    void updateModuleStatusShouldToggleActive() {
+        Module current = moduleExisting(1L, "ATS");
+        when(moduleRepository.findById(1L)).thenReturn(Optional.of(current));
+        when(moduleRepository.save(any(Module.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Module updated = moduleService.updateModuleStatus(1L, false);
+        assertFalse(updated.isActive());
+        assertNotNull(updated.getUpdatedAt());
+
+        updated = moduleService.updateModuleStatus(1L, true);
+        assertTrue(updated.isActive());
+    }
+
+    @Test
+    void updateModuleStatusShouldThrowWhenModuleNotFound() {
+        when(moduleRepository.findById(99L)).thenReturn(Optional.empty());
+        assertThrows(ModuleNotFoundException.class, () -> moduleService.updateModuleStatus(99L, false));
     }
 
     @Test

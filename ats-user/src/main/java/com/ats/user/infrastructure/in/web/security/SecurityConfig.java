@@ -77,6 +77,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/modules/*").hasAuthority("MODULE_READ")
                         .requestMatchers(HttpMethod.PUT, "/api/modules/*").hasAuthority("MODULE_UPDATE")
                         .requestMatchers(HttpMethod.DELETE, "/api/modules/*").hasAuthority("MODULE_DELETE")
+                        .requestMatchers(HttpMethod.PATCH, "/api/modules/*/status").hasAuthority("MODULE_STATUS_UPDATE")
 
                         .requestMatchers(HttpMethod.POST, "/api/menus").hasAuthority("MENU_CREATE")
                         .requestMatchers(HttpMethod.GET, "/api/menus").hasAuthority("MENU_READ")
