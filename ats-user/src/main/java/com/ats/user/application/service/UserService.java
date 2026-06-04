@@ -85,6 +85,23 @@ public class UserService implements UserUseCase {
     }
 
     @Override
+    public User changeUserRole(Long userId, Long roleId) {
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
+        if (Boolean.FALSE.equals(currentUser.getActive())) {
+            throw new UserNotFoundException("User not found: " + userId);
+        }
+        var role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RoleNotAvailableException("Role not found: " + roleId));
+        if (!role.isActive()) {
+            throw new RoleNotAvailableException("Role is not active: " + roleId);
+        }
+        currentUser.setRoles(Set.of(role));
+        currentUser.setUpdatedAt(LocalDateTime.now());
+        return userRepository.save(currentUser);
+    }
+
+    @Override
     public User updateStatus(Long id, boolean active) {
         User current = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + id));
