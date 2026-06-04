@@ -9,7 +9,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ats_pg_data:/var/lib/postgresql/data
+      - ats_user_pg_data:/var/lib/postgresql/data
 
 volumes:
-  ats_pg_data:
+  ats_user_pg_data:
