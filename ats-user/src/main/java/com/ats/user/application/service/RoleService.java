@@ -3,6 +3,7 @@ package com.ats.user.application.service;
 import com.ats.user.domain.exception.PermissionNotFoundException;
 import com.ats.user.domain.exception.RoleAlreadyExistsException;
 import com.ats.user.domain.exception.RoleNotFoundException;
+import com.ats.user.domain.exception.RolePermissionNotFoundException;
 import com.ats.user.domain.model.Page;
 import com.ats.user.domain.model.PageQuery;
 import com.ats.user.domain.model.Role;
@@ -134,8 +135,20 @@ public class RoleService implements RoleUseCase {
         }
         role.setUpdatedAt(LocalDateTime.now());
         return roleRepository.save(role);
+    }
 
-
+    @Override
+    public void removePermission(Long roleId, Long permissionId) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleId));
+        boolean removed = role.getPermissions().removeIf(p -> p.getId().equals(permissionId));
+        if (!removed) {
+            throw new RolePermissionNotFoundException(
+                    "Permission " + permissionId + " is not assigned to role " + roleId
+            );
+        }
+        role.setUpdatedAt(LocalDateTime.now());
+        roleRepository.save(role);
     }
 
     private String normalizeName(String roleName) {
