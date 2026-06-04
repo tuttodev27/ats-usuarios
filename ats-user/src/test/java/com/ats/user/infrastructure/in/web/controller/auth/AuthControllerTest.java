@@ -1,6 +1,11 @@
 package com.ats.user.infrastructure.in.web.controller.auth;
 
 import com.ats.user.AtsUserApplication;
+import com.ats.user.infrastructure.out.entity.PermissionEntity;
+import com.ats.user.infrastructure.out.entity.RoleEntity;
+import com.ats.user.infrastructure.out.entity.RolePermissionEntity;
+import com.ats.user.infrastructure.out.entity.RolePermissionId;
+import com.ats.user.infrastructure.out.entity.UserEntity;
 import com.ats.user.infrastructure.out.repository.MenuJpaRepository;
 import com.ats.user.infrastructure.out.repository.ModuleJpaRepository;
 import com.ats.user.infrastructure.out.repository.PermissionJpaRepository;
@@ -20,6 +25,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -66,12 +73,45 @@ class AuthControllerTest {
 
     @Test
     void loginShouldReturn200AndJwtWhenCredentialsAreValid() throws Exception {
+        var permission = PermissionEntity.builder()
+                .id(1L)
+                .code("USER_CREATE")
+                .active(true)
+                .build();
+
+        var role = RoleEntity.builder()
+                .id(1L)
+                .name("ADMIN")
+                .active(true)
+                .build();
+
+        var rolePermission = RolePermissionEntity.builder()
+                .id(new RolePermissionId(1L, 1L))
+                .role(role)
+                .permission(permission)
+                .active(true)
+                .build();
+
+        role.setRolePermissions(Set.of(rolePermission));
+
+        var userEntity = UserEntity.builder()
+                .id(1L)
+                .name("Admin")
+                .lastName("User")
+                .email("admin@ats.local")
+                .phone("123456789")
+                .passwordHash("$2a$10$hash")
+                .active(true)
+                .roles(Set.of(role))
+                .build();
+
         var userDetails = User.builder()
                 .username("admin@ats.local")
                 .password("$2a$10$hash")
-                .authorities(List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))
+                .authorities(List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("USER_CREATE")))
                 .build();
 
+        when(userJpaRepository.findByEmail("admin@ats.local")).thenReturn(Optional.of(userEntity));
         when(userDetailsService.loadUserByUsername("admin@ats.local")).thenReturn(userDetails);
 
         mockMvc.perform(post("/api/auth/login")
@@ -80,7 +120,14 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isString())
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
-                .andExpect(jsonPath("$.expiredInSeconds").isNumber());
+                .andExpect(jsonPath("$.expiredInSeconds").isNumber())
+                .andExpect(jsonPath("$.user.id").value(1))
+                .andExpect(jsonPath("$.user.name").value("Admin"))
+                .andExpect(jsonPath("$.user.lastName").value("User"))
+                .andExpect(jsonPath("$.user.email").value("admin@ats.local"))
+                .andExpect(jsonPath("$.user.phone").value("123456789"))
+                .andExpect(jsonPath("$.roles[0]").value("ROLE_ADMIN"))
+                .andExpect(jsonPath("$.permissions[0]").value("USER_CREATE"));
     }
 
     @Test
@@ -105,6 +152,33 @@ class AuthControllerTest {
                         .content(validLoginRequestJson()))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("USER_INACTIVE"));
+    }
+
+    @Test
+    void loginShouldReturn403WhenUserHasNoActiveRoles() throws Exception {
+        var role = RoleEntity.builder()
+                .id(1L)
+                .name("INACTIVE_ROLE")
+                .active(false)
+                .build();
+
+        var userEntity = UserEntity.builder()
+                .id(1L)
+                .name("Admin")
+                .lastName("User")
+                .email("admin@ats.local")
+                .phone("123456789")
+                .passwordHash("$2a$10$hash")
+                .active(true)
+                .roles(Set.of(role))
+                .build();
+
+        when(userJpaRepository.findByEmail("admin@ats.local")).thenReturn(Optional.of(userEntity));
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(APPLICATION_JSON)
+                        .content(validLoginRequestJson()))
+                .andExpect(status().isForbidden());
     }
 
     @Test

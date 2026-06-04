@@ -18,10 +18,10 @@ import java.util.Set;
 @Service
 public class UserService implements UserUseCase {
 
-    public final UserRepositoryPort userRepository;
-    public final RoleRepositoryPort roleRepository;
-    public final PasswordHasherPort passwordHasher;
-    public final PasswordPolicy passwordPolicy;
+    private final UserRepositoryPort userRepository;
+    private final RoleRepositoryPort roleRepository;
+    private final PasswordHasherPort passwordHasher;
+    private final PasswordPolicy passwordPolicy;
 
     public UserService(UserRepositoryPort userRepository,
                        RoleRepositoryPort roleRepository,
