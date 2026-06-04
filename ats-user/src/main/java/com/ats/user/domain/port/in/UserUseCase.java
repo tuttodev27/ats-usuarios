@@ -14,4 +14,5 @@ public interface UserUseCase {
     List<Role> listAvailableRoles();
     User update(Long id, User user);
     void delete(Long id);
+    User updateStatus(Long id, boolean active);
 }
