@@ -1,5 +1,7 @@
 package com.ats.user.domain.port.out;
 
+import com.ats.user.domain.model.Page;
+import com.ats.user.domain.model.PageQuery;
 import com.ats.user.domain.model.User;
 
 import java.util.List;
@@ -12,6 +14,7 @@ public interface UserRepositoryPort {
     Optional<User> findById(Long id);
     List<User> findAll();
     List<User> findAllByActive(boolean active);
+    Page<User> searchUsers(String search, Boolean active, PageQuery pageQuery);
     boolean existsById(Long id);
     void delete(Long id);
 }

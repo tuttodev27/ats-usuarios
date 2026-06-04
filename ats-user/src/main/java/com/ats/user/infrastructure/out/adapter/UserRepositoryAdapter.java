@@ -1,11 +1,15 @@
 package com.ats.user.infrastructure.out.adapter;
 
 import com.ats.user.domain.exception.UserNotFoundException;
+import com.ats.user.domain.model.Page;
+import com.ats.user.domain.model.PageQuery;
 import com.ats.user.domain.model.User;
 import com.ats.user.domain.port.out.UserRepositoryPort;
 import com.ats.user.infrastructure.out.mapper.UserMapper;
 import com.ats.user.infrastructure.out.repository.UserJpaRepository;
+import com.ats.user.infrastructure.out.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -52,6 +56,17 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         return userJpaRepository.findAllByActive(active).stream()
                 .map(userMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Page<User> searchUsers(String search, Boolean active, PageQuery pageQuery) {
+        var spec = UserSpecification.withFilters(search, active);
+        var pageable = PageRequest.of(pageQuery.page(), pageQuery.size());
+        var springPage = userJpaRepository.findAll(spec, pageable);
+        var content = springPage.getContent().stream()
+                .map(userMapper::toDomain)
+                .toList();
+        return new Page<>(content, springPage.getNumber(), springPage.getSize(), springPage.getTotalElements());
     }
 
     @Override
