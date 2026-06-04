@@ -11,5 +11,11 @@ services:
     volumes:
       - ats_user_pg_data:/var/lib/postgresql/data
 
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d ats_users" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   ats_user_pg_data:

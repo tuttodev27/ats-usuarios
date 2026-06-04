@@ -4,6 +4,7 @@ import com.ats.user.domain.model.PageQuery;
 import com.ats.user.domain.model.User;
 import com.ats.user.domain.port.in.UserUseCase;
 import com.ats.user.infrastructure.in.web.dto.request.UpdateUserRequest;
+import com.ats.user.infrastructure.in.web.dto.request.UpdateUserStatusRequest;
 import com.ats.user.infrastructure.in.web.dto.request.UserRequest;
 import com.ats.user.infrastructure.in.web.dto.response.PagedResponse;
 import com.ats.user.infrastructure.in.web.dto.response.RoleResponse;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -95,6 +97,16 @@ public class UserController {
     ) {
         var user = userWebMapper.toDomain(request);
         var updated = userUseCase.update(id, user);
+        return ResponseEntity.ok(userWebMapper.toResponse(updated));
+    }
+
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "Activar/desactivar usuario", description = "Cambia el estado activo/inactivo del usuario")
+    public ResponseEntity<UserResponse> updateStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserStatusRequest request
+    ) {
+        var updated = userUseCase.updateStatus(id, request.active());
         return ResponseEntity.ok(userWebMapper.toResponse(updated));
     }
 }

@@ -85,6 +85,15 @@ public class UserService implements UserUseCase {
     }
 
     @Override
+    public User updateStatus(Long id, boolean active) {
+        User current = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + id));
+        current.setActive(active);
+        current.setUpdatedAt(LocalDateTime.now());
+        return userRepository.save(current);
+    }
+
+    @Override
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User not found: " + id);
