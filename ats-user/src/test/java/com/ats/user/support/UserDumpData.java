@@ -52,7 +52,6 @@ public final class UserDumpData {
                 .lastName("Gallegos Updated")
                 .countryCode("+51")
                 .phone("987123123")
-                .active(false)
                 .build();
     }
 

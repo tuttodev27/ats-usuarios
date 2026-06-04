@@ -19,8 +19,6 @@ public record UpdateUserRequest(
 
         @NotBlank
         @Pattern(regexp = "^[0-9]{6,20}$", message = "phone must be numeric 6-20 digits")
-        String phone,
-
-        Boolean active
+        String phone
 ) {
 }

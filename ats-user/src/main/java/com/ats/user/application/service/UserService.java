@@ -80,9 +80,6 @@ public class UserService implements UserUseCase {
         currentUser.setLastName(user.getLastName());
         currentUser.setCountryCode(user.getCountryCode());
         currentUser.setPhone(user.getPhone());
-        if(user.getActive() !=null){
-            currentUser.setActive(user.getActive());
-        }
         currentUser.setUpdatedAt(LocalDateTime.now());
         return userRepository.save(currentUser);
     }
