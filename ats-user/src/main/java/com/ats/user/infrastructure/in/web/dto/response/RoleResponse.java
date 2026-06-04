@@ -7,6 +7,7 @@ public record RoleResponse(
         String name,
         String description,
         boolean active,
+        int permissionsCount,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {

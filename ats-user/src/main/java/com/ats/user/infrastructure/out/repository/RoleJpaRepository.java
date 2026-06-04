@@ -3,11 +3,12 @@ package com.ats.user.infrastructure.out.repository;
 import com.ats.user.infrastructure.out.entity.RoleEntity;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface RoleJpaRepository extends JpaRepository<RoleEntity, Long> {
+public interface RoleJpaRepository extends JpaRepository<RoleEntity, Long>, JpaSpecificationExecutor<RoleEntity> {
     @EntityGraph(attributePaths = {"rolePermissions", "rolePermissions.permission", "rolePermissions.permission.module"})
     Optional<RoleEntity> findWithPermissionsById(Long id);
 
