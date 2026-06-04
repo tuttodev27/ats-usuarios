@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -26,6 +27,11 @@ public class PermissionRepositoryAdapter implements PermissionRepositoryPort {
         return permissionJpaRepository.findAllWithModuleOrderByModuleCodeAscCodeAsc().stream()
                 .map(this::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Optional<Permission> findById(Long id) {
+        return permissionJpaRepository.findById(id).map(this::toDomain);
     }
 
     private Permission toDomain(com.ats.user.infrastructure.out.entity.PermissionEntity entity) {

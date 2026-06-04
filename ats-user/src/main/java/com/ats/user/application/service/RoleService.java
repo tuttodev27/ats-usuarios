@@ -141,6 +141,8 @@ public class RoleService implements RoleUseCase {
     public void removePermission(Long roleId, Long permissionId) {
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleId));
+        permissionRepository.findById(permissionId)
+                .orElseThrow(() -> new PermissionNotFoundException("Permission not found: " + permissionId));
         boolean removed = role.getPermissions().removeIf(p -> p.getId().equals(permissionId));
         if (!removed) {
             throw new RolePermissionNotFoundException(

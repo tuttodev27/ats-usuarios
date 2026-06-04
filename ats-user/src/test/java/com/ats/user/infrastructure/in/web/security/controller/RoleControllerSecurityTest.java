@@ -291,6 +291,28 @@ public class RoleControllerSecurityTest {
     }
 
     @Test
+    void removePermissionShouldReturn401WhenUnauthenticated() throws Exception {
+        mockMvc.perform(delete("/api/roles/1/permissions/5"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+    }
+
+    @Test
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_UPDATE"})
+    void removePermissionShouldReturn403WhenUserDoesNotHaveRemovePermission() throws Exception {
+        mockMvc.perform(delete("/api/roles/1/permissions/5"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+    }
+
+    @Test
+    @WithMockUser(username = "user@ats.local", authorities = {"ROLE_PERMISSION_REMOVE"})
+    void removePermissionShouldReturn204WhenUserHasRemovePermission() throws Exception {
+        mockMvc.perform(delete("/api/roles/1/permissions/5"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
     @WithMockUser(username = "user@ats.local", authorities = {"ROLE_UPDATE"})
     void updateStatusShouldReturn403WhenUserDoesNotHaveStatusUpdatePermission() throws Exception {
         mockMvc.perform(patch("/api/roles/1/status")
