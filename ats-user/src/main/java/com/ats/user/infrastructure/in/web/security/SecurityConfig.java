@@ -68,6 +68,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/roles/*").hasAuthority("ROLE_DELETE")
                         .requestMatchers(HttpMethod.PATCH, "/api/roles/*/status").hasAuthority("ROLE_STATUS_UPDATE")
                         .requestMatchers(HttpMethod.PUT, "/api/roles/*/permissions").hasAuthority("ROLE_PERMISSION_ASSIGN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/roles/*/permissions/*").hasAuthority("ROLE_PERMISSION_REMOVE")
                         .requestMatchers(HttpMethod.DELETE, "/api/roles/*/permissions").hasAuthority("ROLE_PERMISSION_REMOVE")
 
                         .requestMatchers(HttpMethod.POST, "/api/modules").hasAuthority("MODULE_CREATE")

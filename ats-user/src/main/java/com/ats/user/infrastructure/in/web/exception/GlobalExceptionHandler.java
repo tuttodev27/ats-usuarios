@@ -10,6 +10,7 @@ import com.ats.user.domain.exception.PermissionNotFoundException;
 import com.ats.user.domain.exception.RoleAlreadyExistsException;
 import com.ats.user.domain.exception.RoleNotAvailableException;
 import com.ats.user.domain.exception.RoleNotFoundException;
+import com.ats.user.domain.exception.RolePermissionNotFoundException;
 import com.ats.user.domain.exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -69,6 +70,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRoleNotAvailable(RoleNotAvailableException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new ErrorResponse(Instant.now(), 400, "ROLE_NOT_AVAILABLE", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(RolePermissionNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleRolePermissionNotFound(RolePermissionNotFoundException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ErrorResponse(Instant.now(), 404, "ROLE_PERMISSION_NOT_FOUND", ex.getMessage(), request.getRequestURI())
         );
     }
 
