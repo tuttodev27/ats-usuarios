@@ -9,6 +9,7 @@ public interface ModuleUserCase {
         List<Module> getModules();
         Module getModuleById(Long id);
         Module updateModule(Long id, Module module);
+        Module updateModuleStatus(Long id, boolean active);
         void deleteModuleById(Long id);
 
 }

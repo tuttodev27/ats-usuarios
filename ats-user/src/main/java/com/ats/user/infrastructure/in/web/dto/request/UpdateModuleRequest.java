@@ -13,8 +13,6 @@ public record UpdateModuleRequest(
         String name,
 
         @Size(max = 255)
-        String description,
-
-        boolean active
+        String description
 ) {
 }

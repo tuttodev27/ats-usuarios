@@ -28,6 +28,7 @@ public class ModuleService implements ModuleUserCase {
         module.setCode(normalizedCode);
         module.setName(normalizeName(module.getName()));
         module.setDescription(normalizeDescription(module.getDescription()));
+        module.setActive(module.isActive());
         module.setCreatedAt(LocalDateTime.now());
         module.setUpdatedAt(LocalDateTime.now());
         return moduleRepository.save(module);
@@ -59,7 +60,15 @@ public class ModuleService implements ModuleUserCase {
         current.setCode(normalizedCode);
         current.setName(normalizeName(module.getName()));
         current.setDescription(normalizeDescription(module.getDescription()));
-        current.setActive(module.isActive());
+        current.setUpdatedAt(LocalDateTime.now());
+        return moduleRepository.save(current);
+    }
+
+    @Override
+    public Module updateModuleStatus(Long id, boolean active) {
+        Module current = moduleRepository.findById(id)
+                .orElseThrow(() -> new ModuleNotFoundException("Module not found: " + id));
+        current.setActive(active);
         current.setUpdatedAt(LocalDateTime.now());
         return moduleRepository.save(current);
     }

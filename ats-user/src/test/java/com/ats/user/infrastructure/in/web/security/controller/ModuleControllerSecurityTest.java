@@ -21,12 +21,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -160,6 +162,37 @@ class ModuleControllerSecurityTest {
         mockMvc.perform(put("/api/modules/1")
                         .contentType(APPLICATION_JSON)
                         .content(validModuleRequestJson()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("ATS"));
+    }
+
+    @Test
+    void updateModuleStatusShouldReturn401WhenUnauthenticated() throws Exception {
+        mockMvc.perform(patch("/api/modules/1/status")
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"active\": false}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+    }
+
+    @Test
+    @WithMockUser(authorities = {"MODULE_READ"})
+    void updateModuleStatusShouldReturn403WhenUserDoesNotHaveStatusUpdatePermission() throws Exception {
+        mockMvc.perform(patch("/api/modules/1/status")
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"active\": false}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+    }
+
+    @Test
+    @WithMockUser(authorities = {"MODULE_STATUS_UPDATE"})
+    void updateModuleStatusShouldReturn200WhenUserHasStatusUpdatePermission() throws Exception {
+        when(moduleUseCase.updateModuleStatus(anyLong(), anyBoolean())).thenReturn(sampleModule());
+
+        mockMvc.perform(patch("/api/modules/1/status")
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"active\": false}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("ATS"));
     }
