@@ -9,8 +9,6 @@ public record UpdateRoleRequest(
         String name,
 
         @Size(max = 255)
-        String description,
-
-        boolean active
+        String description
 ) {
 }

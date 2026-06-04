@@ -76,7 +76,6 @@ class RoleServiceTest {
         Role updateInput = Role.builder()
                 .name("recruiter")
                 .description("nuevo")
-                .active(false)
                 .build();
 
         when(roleRepository.findById(1L)).thenReturn(Optional.of(current));
@@ -87,7 +86,7 @@ class RoleServiceTest {
 
         assertEquals("RECRUITER", updated.getName());
         assertEquals("nuevo", updated.getDescription());
-        assertFalse(updated.isActive());
+        assertTrue(updated.isActive());
         assertNotNull(updated.getUpdatedAt());
     }
 
@@ -95,7 +94,7 @@ class RoleServiceTest {
     void updateShouldFailWhenNameBelongsToAnotherRole() {
         Role current = roleExisting(1L, "ADMIN", true);
         Role another = roleExisting(2L, "RECRUITER", true);
-        Role updateInput = Role.builder().name("recruiter").active(true).build();
+        Role updateInput = Role.builder().name("recruiter").build();
 
         when(roleRepository.findById(1L)).thenReturn(Optional.of(current));
         when(roleRepository.findByNameIgnoreCase("RECRUITER")).thenReturn(Optional.of(another));

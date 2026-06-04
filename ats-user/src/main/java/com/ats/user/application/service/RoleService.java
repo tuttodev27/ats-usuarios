@@ -73,7 +73,6 @@ public class RoleService implements RoleUseCase {
 
         current.setName(normalizedName);
         current.setDescription(role.getDescription());
-        current.setActive(role.isActive());
         current.setUpdatedAt(LocalDateTime.now());
         return roleRepository.save(current);
     }
