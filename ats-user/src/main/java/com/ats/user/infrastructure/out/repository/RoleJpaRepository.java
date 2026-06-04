@@ -17,5 +17,6 @@ public interface RoleJpaRepository extends JpaRepository<RoleEntity, Long> {
     boolean existsByNameIgnoreCase(String name);
     Optional<RoleEntity> findByNameIgnoreCase(String name);
     Optional<RoleEntity> findByNameIgnoreCaseAndActiveTrue(String name);
+    @EntityGraph(attributePaths = {"rolePermissions", "rolePermissions.permission"})
     List<RoleEntity> findAllByActiveTrueOrderByNameAsc();
 }

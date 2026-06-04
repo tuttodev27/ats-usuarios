@@ -1,6 +1,7 @@
 package com.ats.user.infrastructure.in.web.security.controller;
 
 import com.ats.user.AtsUserApplication;
+import com.ats.user.domain.model.Role;
 import com.ats.user.domain.port.in.UserUseCase;
 import com.ats.user.infrastructure.out.repository.MenuJpaRepository;
 import com.ats.user.infrastructure.out.repository.ModuleJpaRepository;
@@ -138,8 +139,8 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_UPDATE"})
-    void listAvailableRolesShouldReturn403WhenUserDoesNotHaveReadPermission() throws Exception {
+    @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_CREATE"})
+    void listAvailableRolesShouldReturn403WhenUserDoesNotHaveReadOrUpdatePermission() throws Exception {
         mockMvc.perform(get("/api/users/roles"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
@@ -148,12 +149,29 @@ class UserControllerSecurityTest {
     @Test
     @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_READ"})
     void listAvailableRolesShouldReturn200WhenUserHasReadPermission() throws Exception {
-        when(userUseCase.listAvailableRoles()).thenReturn(List.of("ADMIN", "RECRUITER"));
+        var admin = Role.builder().id(1L).name("ADMIN").description("Administrator role").active(true).build();
+        var recruiter = Role.builder().id(2L).name("RECRUITER").description("Recruiter role").active(true).build();
+        when(userUseCase.listAvailableRoles()).thenReturn(List.of(admin, recruiter));
 
         mockMvc.perform(get("/api/users/roles"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0]").value("ADMIN"))
-                .andExpect(jsonPath("$[1]").value("RECRUITER"));
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("ADMIN"))
+                .andExpect(jsonPath("$[0].active").value(true))
+                .andExpect(jsonPath("$[1].id").value(2))
+                .andExpect(jsonPath("$[1].name").value("RECRUITER"));
+    }
+
+    @Test
+    @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_UPDATE"})
+    void listAvailableRolesShouldReturn200WhenUserHasUpdatePermission() throws Exception {
+        var admin = Role.builder().id(1L).name("ADMIN").description("Administrator role").active(true).build();
+        when(userUseCase.listAvailableRoles()).thenReturn(List.of(admin));
+
+        mockMvc.perform(get("/api/users/roles"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("ADMIN"));
     }
 
     @Test

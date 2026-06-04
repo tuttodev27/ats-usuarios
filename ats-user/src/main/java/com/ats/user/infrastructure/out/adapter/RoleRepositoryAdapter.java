@@ -79,4 +79,11 @@ public class RoleRepositoryAdapter implements RoleRepositoryPort {
                 .toList();
     }
 
+    @Override
+    public List<Role> findAllActive() {
+        return roleJpaRepository.findAllByActiveTrueOrderByNameAsc().stream()
+                .map(roleMapper::toDomain)
+                .toList();
+    }
+
 }

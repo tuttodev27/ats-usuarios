@@ -55,7 +55,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/api/users").hasAuthority("USER_CREATE")
                         .requestMatchers(HttpMethod.GET, "/api/users").hasAuthority("USER_READ")
-                        .requestMatchers(HttpMethod.GET, "/api/users/roles").hasAuthority("USER_READ")
+                        .requestMatchers(HttpMethod.GET, "/api/users/roles").hasAnyAuthority("USER_READ", "USER_UPDATE")
                         .requestMatchers(HttpMethod.GET, "/api/users/*").hasAuthority("USER_READ")
                         .requestMatchers(HttpMethod.PUT, "/api/users/*").hasAuthority("USER_UPDATE")
                         .requestMatchers(HttpMethod.DELETE, "/api/users/*").hasAuthority("USER_DELETE")

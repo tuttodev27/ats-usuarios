@@ -13,4 +13,5 @@ public interface RoleRepositoryPort {
     Optional<Role> findByNameIgnoreCase(String roleName);
     Optional<Role> findActiveByName(String roleName);
     List<String> listActiveRoleNames();
+    List<Role> findAllActive();
 }
