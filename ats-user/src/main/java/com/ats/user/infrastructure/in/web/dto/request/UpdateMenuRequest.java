@@ -14,12 +14,13 @@ public record UpdateMenuRequest(
         @Size(max = 200)
         String path,
 
+        @Size(max = 120)
+        String icon,
+
         Integer orderIndex,
 
         @Size(max = 120)
         String requiredPermissionCode,
-
-        boolean active,
 
         @NotNull
         @Positive

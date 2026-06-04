@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
         Long id;
         String title;
         String path;
+        String icon;
         Long moduleId;
         Integer orderIndex;
         String requiredPermissionCode;

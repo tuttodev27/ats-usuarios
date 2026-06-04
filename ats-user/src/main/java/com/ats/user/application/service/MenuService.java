@@ -33,6 +33,7 @@ public class MenuService implements MenuUseCase {
         Long moduleId = validateModuleId(menu.getModuleId());
         menu.setTitle(normalizeTitle(menu.getTitle()));
         menu.setPath(normalizedPath);
+        menu.setIcon(menu.getIcon());
         menu.setRequiredPermissionCode(normalizePermissionCode(menu.getRequiredPermissionCode()));
         menu.setModuleId(moduleId);
         menu.setCreatedAt(LocalDateTime.now());
@@ -66,10 +67,19 @@ public class MenuService implements MenuUseCase {
         Long moduleId = validateModuleId(menu.getModuleId());
         current.setTitle(normalizeTitle(menu.getTitle()));
         current.setPath(normalizedPath);
+        current.setIcon(menu.getIcon());
         current.setOrderIndex(menu.getOrderIndex());
         current.setRequiredPermissionCode(normalizePermissionCode(menu.getRequiredPermissionCode()));
         current.setModuleId(moduleId);
-        current.setActive(menu.isActive());
+        current.setUpdatedAt(LocalDateTime.now());
+        return menuRepository.save(current);
+    }
+
+    @Override
+    public Menu updateStatus(Long id, boolean active) {
+        Menu current = menuRepository.findById(id)
+                .orElseThrow(() -> new MenuNotFoundException("Menu not found: " + id));
+        current.setActive(active);
         current.setUpdatedAt(LocalDateTime.now());
         return menuRepository.save(current);
     }

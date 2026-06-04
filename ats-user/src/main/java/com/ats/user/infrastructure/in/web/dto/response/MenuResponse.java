@@ -6,6 +6,7 @@ public record MenuResponse(
         Long id,
         String title,
         String path,
+        String icon,
         Long moduleId,
         Integer orderIndex,
         String requiredPermissionCode,

@@ -22,12 +22,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -108,6 +110,7 @@ class MenuControllerSecurityTest {
                                 {
                                   "title": "Dashboard",
                                   "path": "/dashboard",
+                                  "icon": "dashboard",
                                   "orderIndex": 1,
                                   "requiredPermissionCode": "ATS_DASHBOARD_VIEW",
                                   "active": true,
@@ -154,7 +157,38 @@ class MenuControllerSecurityTest {
                         .contentType(APPLICATION_JSON)
                         .content(validMenuRequestJson()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.requiredPermissionCode").value("ATS_DASHBOARD_VIEW"));
+                .andExpect(jsonPath("$.path").value("/dashboard"));
+    }
+
+    @Test
+    void updateStatusShouldReturn401WhenUnauthenticated() throws Exception {
+        mockMvc.perform(patch("/api/menus/1/status")
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"active\": false}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+    }
+
+    @Test
+    @WithMockUser(authorities = {"MENU_READ"})
+    void updateStatusShouldReturn403WhenUserDoesNotHaveStatusUpdatePermission() throws Exception {
+        mockMvc.perform(patch("/api/menus/1/status")
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"active\": false}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+    }
+
+    @Test
+    @WithMockUser(authorities = {"MENU_STATUS_UPDATE"})
+    void updateStatusShouldReturn200WhenUserHasStatusUpdatePermission() throws Exception {
+        when(menuUseCase.updateStatus(anyLong(), anyBoolean())).thenReturn(sampleMenu());
+
+        mockMvc.perform(patch("/api/menus/1/status")
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"active\": false}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.path").value("/dashboard"));
     }
 
     @Test
@@ -180,6 +214,7 @@ class MenuControllerSecurityTest {
                 .id(1L)
                 .title("Dashboard")
                 .path("/dashboard")
+                .icon("dashboard")
                 .moduleId(1L)
                 .orderIndex(1)
                 .requiredPermissionCode("ATS_DASHBOARD_VIEW")
@@ -194,6 +229,7 @@ class MenuControllerSecurityTest {
                 {
                   "title": "Dashboard",
                   "path": "/dashboard",
+                  "icon": "dashboard",
                   "orderIndex": 1,
                   "requiredPermissionCode": "ATS_DASHBOARD_VIEW",
                   "active": true,

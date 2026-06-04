@@ -26,6 +26,7 @@ public class MenuRepositoryAdapter implements MenuRepositoryPort {
 
         entity.setTitle(menu.getTitle());
         entity.setPath(menu.getPath());
+        entity.setIcon(menu.getIcon());
         entity.setOrderIndex(menu.getOrderIndex());
         entity.setRequiredPermissionCode(menu.getRequiredPermissionCode());
         entity.setActive(menu.isActive());
@@ -63,6 +64,7 @@ public class MenuRepositoryAdapter implements MenuRepositoryPort {
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .path(entity.getPath())
+                .icon(entity.getIcon())
                 .moduleId(entity.getModule() != null ? entity.getModule().getId() : null)
                 .orderIndex(entity.getOrderIndex())
                 .requiredPermissionCode(entity.getRequiredPermissionCode())

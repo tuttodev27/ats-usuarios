@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS menus (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(120) NOT NULL,
     path VARCHAR(200) NOT NULL UNIQUE,
+    icon VARCHAR(120),
     order_index INTEGER,
     required_permission_code VARCHAR(120),
     active BOOLEAN NOT NULL,

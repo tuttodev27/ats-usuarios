@@ -14,6 +14,9 @@ public record CreateMenuRequest(
         @Size(max = 200)
         String path,
 
+        @Size(max = 120)
+        String icon,
+
         Integer orderIndex,
 
         @Size(max = 120)
