@@ -4,6 +4,7 @@ import com.ats.user.domain.model.PageQuery;
 import com.ats.user.domain.model.User;
 import com.ats.user.domain.port.in.UserUseCase;
 import com.ats.user.infrastructure.in.web.dto.request.UpdateUserRequest;
+import com.ats.user.infrastructure.in.web.dto.request.UpdateUserRoleRequest;
 import com.ats.user.infrastructure.in.web.dto.request.UpdateUserStatusRequest;
 import com.ats.user.infrastructure.in.web.dto.request.UserRequest;
 import com.ats.user.infrastructure.in.web.dto.response.PagedResponse;
@@ -97,6 +98,16 @@ public class UserController {
     ) {
         var user = userWebMapper.toDomain(request);
         var updated = userUseCase.update(id, user);
+        return ResponseEntity.ok(userWebMapper.toResponse(updated));
+    }
+
+    @PutMapping("/{id}/roles")
+    @Operation(summary = "Cambiar rol de un usuario", description = "Reemplaza el rol actual del usuario por uno nuevo")
+    public ResponseEntity<UserResponse> changeUserRole(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserRoleRequest request
+    ) {
+        var updated = userUseCase.changeUserRole(id, request.roleId());
         return ResponseEntity.ok(userWebMapper.toResponse(updated));
     }
 

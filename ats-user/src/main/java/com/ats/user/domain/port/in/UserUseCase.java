@@ -13,6 +13,7 @@ public interface UserUseCase {
     Page<User> listUsers(String search, Boolean active, PageQuery pageQuery);
     List<Role> listAvailableRoles();
     User update(Long id, User user);
+    User changeUserRole(Long userId, Long roleId);
     void delete(Long id);
     User updateStatus(Long id, boolean active);
 }
