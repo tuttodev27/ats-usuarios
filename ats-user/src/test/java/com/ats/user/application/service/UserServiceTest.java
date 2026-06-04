@@ -130,13 +130,17 @@ class UserServiceTest {
     }
 
     @Test
-    void listAvailableRolesShouldDelegateToRoleRepository() {
-        when(roleRepository.listActiveRoleNames()).thenReturn(List.of("ADMIN", "RECRUITER"));
-        List<String> roles = userService.listAvailableRoles();
+    void listAvailableRolesShouldReturnActiveRoles() {
+        var admin = Role.builder().id(1L).name("ADMIN").description("Administrator").active(true).build();
+        var recruiter = Role.builder().id(2L).name("RECRUITER").description("Recruiter").active(true).build();
+        when(roleRepository.findAllActive()).thenReturn(List.of(admin, recruiter));
+
+        var roles = userService.listAvailableRoles();
 
         assertEquals(2, roles.size());
-        assertEquals("ADMIN", roles.get(0));
-        verify(roleRepository).listActiveRoleNames();
+        assertEquals("ADMIN", roles.get(0).getName());
+        assertEquals("RECRUITER", roles.get(1).getName());
+        verify(roleRepository).findAllActive();
     }
 
     @Test

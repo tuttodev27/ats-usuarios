@@ -4,7 +4,9 @@ import com.ats.user.domain.model.User;
 import com.ats.user.domain.port.in.UserUseCase;
 import com.ats.user.infrastructure.in.web.dto.request.UpdateUserRequest;
 import com.ats.user.infrastructure.in.web.dto.request.UserRequest;
+import com.ats.user.infrastructure.in.web.dto.response.RoleResponse;
 import com.ats.user.infrastructure.in.web.dto.response.UserResponse;
+import com.ats.user.infrastructure.in.web.mapper.RoleWebMapper;
 import com.ats.user.infrastructure.in.web.mapper.UserWebMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -34,6 +36,7 @@ import java.util.List;
 public class UserController {
     private final UserUseCase userUseCase;
     private final UserWebMapper userWebMapper;
+    private final RoleWebMapper roleWebMapper;
 
     @PostMapping()
     @Operation(summary = "Crear usuario", description = "Crea un usuario nuevo y asigna un rol")
@@ -60,9 +63,11 @@ public class UserController {
     }
 
     @GetMapping("/roles")
-    @Operation(summary = "Listar roles disponibles")
-    public ResponseEntity<List<String>> listAvailableRoles() {
-        List<String> roles = userUseCase.listAvailableRoles();
+    @Operation(summary = "Listar roles activos disponibles para asignacion")
+    public ResponseEntity<List<RoleResponse>> listAvailableRoles() {
+        var roles = userUseCase.listAvailableRoles().stream()
+                .map(roleWebMapper::toResponse)
+                .toList();
         return ResponseEntity.ok(roles);
     }
 

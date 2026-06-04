@@ -4,6 +4,7 @@ import com.ats.user.application.service.password.PasswordPolicy;
 import com.ats.user.domain.exception.EmailAlreadyExistException;
 import com.ats.user.domain.exception.RoleNotFoundException;
 import com.ats.user.domain.exception.UserNotFoundException;
+import com.ats.user.domain.model.Role;
 import com.ats.user.domain.model.User;
 import com.ats.user.domain.port.in.UserUseCase;
 import com.ats.user.domain.port.out.PasswordHasherPort;
@@ -65,8 +66,8 @@ public class UserService implements UserUseCase {
     }
 
     @Override
-    public List<String> listAvailableRoles() {
-        return roleRepository.listActiveRoleNames();
+    public List<Role> listAvailableRoles() {
+        return roleRepository.findAllActive();
     }
 
     @Override
