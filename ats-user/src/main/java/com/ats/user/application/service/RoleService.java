@@ -3,6 +3,8 @@ package com.ats.user.application.service;
 import com.ats.user.domain.exception.PermissionNotFoundException;
 import com.ats.user.domain.exception.RoleAlreadyExistsException;
 import com.ats.user.domain.exception.RoleNotFoundException;
+import com.ats.user.domain.model.Page;
+import com.ats.user.domain.model.PageQuery;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.port.in.RoleUseCase;
 import com.ats.user.domain.port.out.PermissionRepositoryPort;
@@ -44,6 +46,11 @@ public class RoleService implements RoleUseCase {
     @Override
     public List<Role> list() {
         return roleRepository.findAll();
+    }
+
+    @Override
+    public Page<Role> listRoles(String search, Boolean active, PageQuery pageQuery) {
+        return roleRepository.searchRoles(search, active, pageQuery);
     }
 
     @Override

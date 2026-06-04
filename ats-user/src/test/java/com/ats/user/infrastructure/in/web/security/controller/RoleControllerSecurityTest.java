@@ -2,6 +2,8 @@ package com.ats.user.infrastructure.in.web.security.controller;
 
 import com.ats.user.AtsUserApplication;
 import com.ats.user.domain.exception.PermissionNotFoundException;
+import com.ats.user.domain.model.Page;
+import com.ats.user.domain.model.PageQuery;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.port.in.RoleUseCase;
 import com.ats.user.infrastructure.out.repository.MenuJpaRepository;
@@ -19,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -117,11 +120,12 @@ public class RoleControllerSecurityTest {
     @Test
     @WithMockUser(username = "user@ats.local", authorities = {"ROLE_READ"})
     void listRolesShouldReturn200WhenUserHasReadPermission() throws Exception {
-        when(roleUseCase.list()).thenReturn(java.util.List.of(sampleRole()));
+        when(roleUseCase.listRoles(null, null, new PageQuery(0, 20)))
+                .thenReturn(new Page<>(List.of(sampleRole()), 0, 20, 1));
 
         mockMvc.perform(get("/api/roles"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("SUPERVISOR"));
+                .andExpect(jsonPath("$.content[0].name").value("SUPERVISOR"));
     }
 
     @Test

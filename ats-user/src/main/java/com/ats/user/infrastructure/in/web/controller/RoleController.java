@@ -1,17 +1,18 @@
 package com.ats.user.infrastructure.in.web.controller;
 
+import com.ats.user.domain.model.PageQuery;
 import com.ats.user.domain.port.in.RoleUseCase;
 import com.ats.user.infrastructure.in.web.dto.request.AssignPermissionRequest;
 import com.ats.user.infrastructure.in.web.dto.request.CreateRoleRequest;
 import com.ats.user.infrastructure.in.web.dto.request.UpdateRoleRequest;
 import com.ats.user.infrastructure.in.web.dto.request.UpdateRoleStatusRequest;
+import com.ats.user.infrastructure.in.web.dto.response.PagedResponse;
 import com.ats.user.infrastructure.in.web.dto.response.RolePermissionsResponse;
 import com.ats.user.infrastructure.in.web.dto.response.RoleResponse;
 import com.ats.user.infrastructure.in.web.exception.ErrorResponse;
 import com.ats.user.infrastructure.in.web.mapper.RoleWebMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,9 +32,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -67,20 +67,28 @@ public class RoleController {
 
     @GetMapping
     @Operation(
-            summary = "Listar roles",
-            description = "Obtiene todos los roles registrados."
+            summary = "Listar roles con busqueda, filtro y paginacion",
+            description = "Obtiene todos los roles registrados con soporte de filtros y paginacion."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Listado de roles",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = RoleResponse.class)))),
+            @ApiResponse(responseCode = "200", description = "Listado paginado de roles",
+                    content = @Content(schema = @Schema(implementation = PagedResponse.class))),
             @ApiResponse(responseCode = "401", description = "No autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<List<RoleResponse>> list() {
-        var roles = roleUseCase.list().stream()
+    public ResponseEntity<PagedResponse<RoleResponse>> list(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        var pageQuery = new PageQuery(page, size);
+        var result = roleUseCase.listRoles(search, active, pageQuery);
+        var content = result.getContent().stream()
                 .map(roleWebMapper::toResponse)
                 .toList();
-        return ResponseEntity.ok(roles);
+        var response = new PagedResponse<>(content, result.getPage(), result.getSize(), result.getTotalElements(), result.getTotalPages());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

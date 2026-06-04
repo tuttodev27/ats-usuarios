@@ -1,12 +1,16 @@
 package com.ats.user.infrastructure.out.adapter;
 
+import com.ats.user.domain.model.Page;
+import com.ats.user.domain.model.PageQuery;
 import com.ats.user.domain.model.Permission;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.port.out.RoleRepositoryPort;
 import com.ats.user.infrastructure.out.entity.RoleEntity;
 import com.ats.user.infrastructure.out.mapper.RoleMapper;
 import com.ats.user.infrastructure.out.repository.RoleJpaRepository;
+import com.ats.user.infrastructure.out.specification.RoleSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -55,6 +59,17 @@ public class RoleRepositoryAdapter implements RoleRepositoryPort {
         return roleJpaRepository.findAllByOrderByIdAsc().stream()
                 .map(roleMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Page<Role> searchRoles(String search, Boolean active, PageQuery pageQuery) {
+        var spec = RoleSpecification.withFilters(search, active);
+        var pageable = PageRequest.of(pageQuery.page(), pageQuery.size());
+        var springPage = roleJpaRepository.findAll(spec, pageable);
+        var content = springPage.getContent().stream()
+                .map(roleMapper::toDomain)
+                .toList();
+        return new Page<>(content, springPage.getNumber(), springPage.getSize(), springPage.getTotalElements());
     }
 
     @Override

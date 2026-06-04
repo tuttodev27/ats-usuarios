@@ -36,6 +36,7 @@ public interface RoleWebMapper {
     @Mapping(target = "permissions", ignore = true)
     Role toDomain(UpdateRoleRequest request);
 
+    @Mapping(target = "permissionsCount", expression = "java(role.getPermissions() != null ? role.getPermissions().size() : 0)")
     RoleResponse toResponse(Role role);
 
     default RolePermissionsResponse toPermissionsResponse(Role role) {
