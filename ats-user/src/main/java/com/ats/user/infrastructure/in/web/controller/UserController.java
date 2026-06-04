@@ -1,9 +1,11 @@
 package com.ats.user.infrastructure.in.web.controller;
 
+import com.ats.user.domain.model.PageQuery;
 import com.ats.user.domain.model.User;
 import com.ats.user.domain.port.in.UserUseCase;
 import com.ats.user.infrastructure.in.web.dto.request.UpdateUserRequest;
 import com.ats.user.infrastructure.in.web.dto.request.UserRequest;
+import com.ats.user.infrastructure.in.web.dto.response.PagedResponse;
 import com.ats.user.infrastructure.in.web.dto.response.RoleResponse;
 import com.ats.user.infrastructure.in.web.dto.response.UserResponse;
 import com.ats.user.infrastructure.in.web.mapper.RoleWebMapper;
@@ -53,13 +55,20 @@ public class UserController {
         return ResponseEntity.ok(userWebMapper.toResponse(user));
     }
     @GetMapping
-    @Operation(summary = "Listar usuarios")
-    public ResponseEntity<List<UserResponse>> listUsers(@RequestParam(required = false) Boolean active) {
-        List<UserResponse> responses = userUseCase.listUsers(active)
-                .stream()
+    @Operation(summary = "Listar usuarios con busqueda, filtro y paginacion")
+    public ResponseEntity<PagedResponse<UserResponse>> listUsers(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        var pageQuery = new PageQuery(page, size);
+        var result = userUseCase.listUsers(search, active, pageQuery);
+        var content = result.getContent().stream()
                 .map(userWebMapper::toResponse)
                 .toList();
-        return ResponseEntity.ok(responses);
+        var response = new PagedResponse<>(content, result.getPage(), result.getSize(), result.getTotalElements(), result.getTotalPages());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/roles")

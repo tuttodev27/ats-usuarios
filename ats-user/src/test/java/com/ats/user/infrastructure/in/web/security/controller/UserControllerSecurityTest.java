@@ -1,6 +1,7 @@
 package com.ats.user.infrastructure.in.web.security.controller;
 
 import com.ats.user.AtsUserApplication;
+import com.ats.user.domain.model.Page;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.port.in.UserUseCase;
 import com.ats.user.infrastructure.out.repository.MenuJpaRepository;
@@ -114,21 +115,28 @@ class UserControllerSecurityTest {
     @Test
     @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_READ"})
     void listUsersShouldReturn200WhenUserHasReadPermission() throws Exception {
-        when(userUseCase.listUsers(null)).thenReturn(List.of(UserDumpData.domainUserExisting()));
+        var userPage = new Page<>(List.of(UserDumpData.domainUserExisting()), 0, 20, 1);
+        when(userUseCase.listUsers(null, null, new com.ats.user.domain.model.PageQuery(0, 20)))
+                .thenReturn(userPage);
 
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].active").value(true));
+                .andExpect(jsonPath("$.content[0].active").value(true))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(20))
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test
     @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_READ"})
     void listUsersShouldReturn200WhenFilteringActiveUsers() throws Exception {
-        when(userUseCase.listUsers(true)).thenReturn(List.of(UserDumpData.domainUserExisting()));
+        var userPage = new Page<>(List.of(UserDumpData.domainUserExisting()), 0, 20, 1);
+        when(userUseCase.listUsers(null, true, new com.ats.user.domain.model.PageQuery(0, 20)))
+                .thenReturn(userPage);
 
         mockMvc.perform(get("/api/users").param("active", "true"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].active").value(true));
+                .andExpect(jsonPath("$.content[0].active").value(true));
     }
 
     @Test

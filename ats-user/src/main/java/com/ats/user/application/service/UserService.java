@@ -4,6 +4,8 @@ import com.ats.user.application.service.password.PasswordPolicy;
 import com.ats.user.domain.exception.EmailAlreadyExistException;
 import com.ats.user.domain.exception.RoleNotAvailableException;
 import com.ats.user.domain.exception.UserNotFoundException;
+import com.ats.user.domain.model.Page;
+import com.ats.user.domain.model.PageQuery;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.model.User;
 import com.ats.user.domain.port.in.UserUseCase;
@@ -61,11 +63,8 @@ public class UserService implements UserUseCase {
     }
 
     @Override
-    public List<User> listUsers(Boolean active) {
-        if (active == null) {
-            return userRepository.findAll();
-        }
-        return userRepository.findAllByActive(active);
+    public Page<User> listUsers(String search, Boolean active, PageQuery pageQuery) {
+        return userRepository.searchUsers(search, active, pageQuery);
     }
 
     @Override

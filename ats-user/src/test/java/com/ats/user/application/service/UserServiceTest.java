@@ -4,6 +4,8 @@ import com.ats.user.application.service.password.PasswordPolicy;
 import com.ats.user.domain.exception.EmailAlreadyExistException;
 import com.ats.user.domain.exception.RoleNotAvailableException;
 import com.ats.user.domain.exception.UserNotFoundException;
+import com.ats.user.domain.model.Page;
+import com.ats.user.domain.model.PageQuery;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.model.User;
 import com.ats.user.domain.port.out.PasswordHasherPort;
@@ -114,23 +116,32 @@ class UserServiceTest {
     }
 
     @Test
-    void listUsersShouldReturnAllWhenFilterIsNull() {
-        when(userRepository.findAll()).thenReturn(List.of(UserDumpData.domainUserExisting()));
-        List<User> users = userService.listUsers(null);
+    void listUsersShouldDelegateToRepositoryWithSearchAndPagination() {
+        var existing = UserDumpData.domainUserExisting();
+        var domainPage = new Page<>(List.of(existing), 0, 20, 1);
+        when(userRepository.searchUsers("admin", null, new PageQuery(0, 20))).thenReturn(domainPage);
 
-        assertEquals(1, users.size());
-        assertEquals("admin@ats.local", users.get(0).getEmail());
+        var result = userService.listUsers("admin", null, new PageQuery(0, 20));
+
+        assertEquals(1, result.getContent().size());
+        assertEquals("admin@ats.local", result.getContent().get(0).getEmail());
+        assertEquals(0, result.getPage());
+        assertEquals(20, result.getSize());
+        assertEquals(1, result.getTotalElements());
+        verify(userRepository).searchUsers("admin", null, new PageQuery(0, 20));
     }
 
     @Test
-    void listUsersShouldReturnOnlyActiveWhenFilterIsTrue() {
-        when(userRepository.findAllByActive(true)).thenReturn(List.of(UserDumpData.domainUserExisting()));
+    void listUsersShouldFilterByActive() {
+        var existing = UserDumpData.domainUserExisting();
+        var domainPage = new Page<>(List.of(existing), 0, 20, 1);
+        when(userRepository.searchUsers(null, true, new PageQuery(0, 20))).thenReturn(domainPage);
 
-        List<User> users = userService.listUsers(true);
+        var result = userService.listUsers(null, true, new PageQuery(0, 20));
 
-        assertEquals(1, users.size());
-        assertEquals("admin@ats.local", users.get(0).getEmail());
-        verify(userRepository).findAllByActive(true);
+        assertEquals(1, result.getContent().size());
+        assertEquals("admin@ats.local", result.getContent().get(0).getEmail());
+        verify(userRepository).searchUsers(null, true, new PageQuery(0, 20));
     }
 
     @Test
