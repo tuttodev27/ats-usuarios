@@ -3,6 +3,7 @@ package com.ats.user.application.service;
 import com.ats.user.domain.exception.PermissionNotFoundException;
 import com.ats.user.domain.exception.RoleAlreadyExistsException;
 import com.ats.user.domain.exception.RoleNotFoundException;
+import com.ats.user.domain.exception.RolePermissionNotFoundException;
 import com.ats.user.domain.model.Permission;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.port.out.PermissionRepositoryPort;
@@ -165,6 +166,54 @@ class RoleServiceTest {
         when(roleRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(RoleNotFoundException.class, () -> roleService.updateStatus(99L, false));
+        verify(roleRepository, never()).save(any());
+    }
+
+    @Test
+    void removePermissionShouldRemoveSinglePermissionAndSave() {
+        Role role = roleExisting(1L, "ADMIN", true);
+        role.setPermissions(new HashSet<>(Set.of(
+                permission(1L, "USER_READ"),
+                permission(2L, "USER_UPDATE")
+        )));
+        when(roleRepository.findById(1L)).thenReturn(Optional.of(role));
+        when(permissionRepository.findById(1L)).thenReturn(Optional.of(permission(1L, "USER_READ")));
+        when(roleRepository.save(any(Role.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        roleService.removePermission(1L, 1L);
+
+        assertTrue(role.getPermissions().stream().noneMatch(p -> p.getId().equals(1L)));
+        assertTrue(role.getPermissions().stream().anyMatch(p -> p.getId().equals(2L)));
+        assertNotNull(role.getUpdatedAt());
+        verify(roleRepository).save(role);
+    }
+
+    @Test
+    void removePermissionShouldThrowWhenPermissionNotFound() {
+        Role role = roleExisting(1L, "ADMIN", true);
+        when(roleRepository.findById(1L)).thenReturn(Optional.of(role));
+        when(permissionRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(PermissionNotFoundException.class, () -> roleService.removePermission(1L, 99L));
+        verify(roleRepository, never()).save(any());
+    }
+
+    @Test
+    void removePermissionShouldThrowWhenPermissionNotAssignedToRole() {
+        Role role = roleExisting(1L, "ADMIN", true);
+        role.setPermissions(new HashSet<>(Set.of(permission(2L, "USER_UPDATE"))));
+        when(roleRepository.findById(1L)).thenReturn(Optional.of(role));
+        when(permissionRepository.findById(99L)).thenReturn(Optional.of(permission(99L, "OTHER")));
+
+        assertThrows(RolePermissionNotFoundException.class, () -> roleService.removePermission(1L, 99L));
+        verify(roleRepository, never()).save(any());
+    }
+
+    @Test
+    void removePermissionShouldThrowWhenRoleNotFound() {
+        when(roleRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(RoleNotFoundException.class, () -> roleService.removePermission(99L, 1L));
         verify(roleRepository, never()).save(any());
     }
 
