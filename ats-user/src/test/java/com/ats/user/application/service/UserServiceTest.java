@@ -2,7 +2,7 @@ package com.ats.user.application.service;
 
 import com.ats.user.application.service.password.PasswordPolicy;
 import com.ats.user.domain.exception.EmailAlreadyExistException;
-import com.ats.user.domain.exception.RoleNotFoundException;
+import com.ats.user.domain.exception.RoleNotAvailableException;
 import com.ats.user.domain.exception.UserNotFoundException;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.model.User;
@@ -47,13 +47,14 @@ class UserServiceTest {
     void createShouldSaveUserAndDefaultActiveUsingDumpData() {
         User input = UserDumpData.domainUserCreate();
         Role recruiterRole = UserDumpData.domainRole("RECRUITER");
+        recruiterRole.setId(2L);
 
         when(userRepository.findByEmail(input.getEmail())).thenReturn(Optional.empty());
-        when(roleRepository.findActiveByName("RECRUITER")).thenReturn(Optional.of(recruiterRole));
+        when(roleRepository.findById(2L)).thenReturn(Optional.of(recruiterRole));
         when(passwordHasher.encode("Clave123")).thenReturn("$2a$10$encodedHash");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        User created = userService.create(input, "RECRUITER", "Clave123");
+        User created = userService.create(input, 2L, "Clave123");
 
         assertNotNull(created);
         assertEquals(true, created.getActive());
@@ -68,27 +69,30 @@ class UserServiceTest {
         User input = UserDumpData.domainUserCreate();
         when(userRepository.findByEmail(input.getEmail())).thenReturn(Optional.of(UserDumpData.domainUserExisting()));
 
-        assertThrows(EmailAlreadyExistException.class, () -> userService.create(input, "RECRUITER", "Clave123"));
+        assertThrows(EmailAlreadyExistException.class, () -> userService.create(input, 2L, "Clave123"));
         verify(userRepository, never()).save(any());
     }
 
     @Test
-    void createShouldFailWhenRoleIsMissing() {
+    void createShouldFailWhenRoleNotFound() {
         User input = UserDumpData.domainUserCreate();
         when(userRepository.findByEmail(input.getEmail())).thenReturn(Optional.empty());
-        when(roleRepository.findActiveByName("NO_ROLE")).thenReturn(Optional.empty());
+        when(roleRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(RoleNotFoundException.class, () -> userService.create(input, "NO_ROLE", "Clave123"));
+        assertThrows(RoleNotAvailableException.class, () -> userService.create(input, 99L, "Clave123"));
         verify(userRepository, never()).save(any());
     }
 
     @Test
     void createShouldFailWhenRoleIsInactive() {
         User input = UserDumpData.domainUserCreate();
+        Role inactiveRole = UserDumpData.domainRole("INACTIVE");
+        inactiveRole.setId(3L);
+        inactiveRole.setActive(false);
         when(userRepository.findByEmail(input.getEmail())).thenReturn(Optional.empty());
-        when(roleRepository.findActiveByName("RECRUITER")).thenReturn(Optional.empty());
+        when(roleRepository.findById(3L)).thenReturn(Optional.of(inactiveRole));
 
-        assertThrows(RoleNotFoundException.class, () -> userService.create(input, "RECRUITER", "Clave123"));
+        assertThrows(RoleNotAvailableException.class, () -> userService.create(input, 3L, "Clave123"));
         verify(userRepository, never()).save(any());
     }
 

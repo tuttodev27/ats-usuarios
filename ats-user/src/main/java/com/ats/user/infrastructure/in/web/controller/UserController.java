@@ -39,10 +39,10 @@ public class UserController {
     private final RoleWebMapper roleWebMapper;
 
     @PostMapping()
-    @Operation(summary = "Crear usuario", description = "Crea un usuario nuevo y asigna un rol")
+    @Operation(summary = "Crear usuario", description = "Crea un usuario nuevo y asigna un rol por ID")
     public ResponseEntity<UserResponse> saveUser(@Valid @RequestBody UserRequest request) {
         var user= userWebMapper.toDomain(request);
-        var created= userUseCase.create(user, request.role(), request.password());
+        var created= userUseCase.create(user, request.roleId(), request.password());
         return ResponseEntity.status(HttpStatus.CREATED).body(userWebMapper.toResponse(created));
     }
 
