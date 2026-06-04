@@ -43,6 +43,9 @@ public class MenuEntity {
     @Column(nullable = false, length = 200, unique = true)
     String path;
 
+    @Column(length = 120)
+    String icon;
+
     @Column(name = "order_index")
     Integer orderIndex;
 

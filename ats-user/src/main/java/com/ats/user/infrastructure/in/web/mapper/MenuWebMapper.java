@@ -16,6 +16,7 @@ public interface MenuWebMapper {
     Menu toDomain(CreateMenuRequest request);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "active", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     Menu toDomain(UpdateMenuRequest request);

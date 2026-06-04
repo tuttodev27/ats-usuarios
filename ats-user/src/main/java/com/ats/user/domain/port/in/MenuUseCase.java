@@ -9,5 +9,6 @@ public interface MenuUseCase {
     List<Menu> list();
     Menu getById(Long id);
     Menu update(Long id, Menu menu);
+    Menu updateStatus(Long id, boolean active);
     void delete(Long id);
 }

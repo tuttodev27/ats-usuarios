@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -110,8 +111,27 @@ class MenuServiceTest {
         assertEquals("/users", updated.getPath());
         assertEquals(2L, updated.getModuleId());
         assertEquals("USER_READ", updated.getRequiredPermissionCode());
+        assertNotNull(updated.getUpdatedAt());
+    }
+
+    @Test
+    void updateStatusShouldToggleActive() {
+        Menu current = menuExisting(1L, "/dashboard");
+        when(menuRepository.findById(1L)).thenReturn(Optional.of(current));
+        when(menuRepository.save(any(Menu.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Menu updated = menuService.updateStatus(1L, false);
         assertFalse(updated.isActive());
         assertNotNull(updated.getUpdatedAt());
+
+        updated = menuService.updateStatus(1L, true);
+        assertTrue(updated.isActive());
+    }
+
+    @Test
+    void updateStatusShouldThrowWhenMenuNotFound() {
+        when(menuRepository.findById(99L)).thenReturn(Optional.empty());
+        assertThrows(MenuNotFoundException.class, () -> menuService.updateStatus(99L, false));
     }
 
     @Test

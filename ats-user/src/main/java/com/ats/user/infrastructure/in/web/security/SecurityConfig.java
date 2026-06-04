@@ -84,6 +84,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/menus/*").hasAuthority("MENU_READ")
                         .requestMatchers(HttpMethod.PUT, "/api/menus/*").hasAuthority("MENU_UPDATE")
                         .requestMatchers(HttpMethod.DELETE, "/api/menus/*").hasAuthority("MENU_DELETE")
+                        .requestMatchers(HttpMethod.PATCH, "/api/menus/*/status").hasAuthority("MENU_STATUS_UPDATE")
 
                         .requestMatchers(HttpMethod.GET, "/api/permissions").hasAuthority("PERMISSION_READ")
 
