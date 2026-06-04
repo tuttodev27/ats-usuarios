@@ -1,0 +1,165 @@
+package com.ats.user.infrastructure.in.web.controller;
+
+import com.ats.user.AtsUserApplication;
+import com.ats.user.domain.exception.EmailAlreadyExistException;
+import com.ats.user.domain.exception.RoleNotAvailableException;
+import com.ats.user.domain.model.Role;
+import com.ats.user.domain.model.User;
+import com.ats.user.domain.port.in.UserUseCase;
+import com.ats.user.infrastructure.out.repository.MenuJpaRepository;
+import com.ats.user.infrastructure.out.repository.ModuleJpaRepository;
+import com.ats.user.infrastructure.out.repository.PermissionJpaRepository;
+import com.ats.user.infrastructure.out.repository.RoleJpaRepository;
+import com.ats.user.infrastructure.out.repository.UserJpaRepository;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Set;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest(
+        classes = AtsUserApplication.class,
+        webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+        properties = {
+                "spring.autoconfigure.exclude=org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration,"
+                        + "org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration,"
+                        + "org.springframework.boot.data.jpa.autoconfigure.DataJpaRepositoriesAutoConfiguration"
+        }
+)
+@AutoConfigureMockMvc
+class UserControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private UserUseCase userUseCase;
+
+    @MockitoBean
+    private UserJpaRepository userJpaRepository;
+
+    @MockitoBean
+    private RoleJpaRepository roleJpaRepository;
+
+    @MockitoBean
+    private PermissionJpaRepository permissionJpaRepository;
+
+    @MockitoBean
+    private ModuleJpaRepository moduleJpaRepository;
+
+    @MockitoBean
+    private MenuJpaRepository menuJpaRepository;
+
+    @Test
+    @WithMockUser(username = "admin@ats.local", authorities = {"USER_CREATE"})
+    void createUserShouldReturn201WhenRequestIsValid() throws Exception {
+        var role = Role.builder().id(2L).name("RECRUITER").active(true).build();
+        var user = User.builder()
+                .id(1L)
+                .name("Pablo")
+                .lastName("Gallegos")
+                .email("pgallegoscelis86@gmail.com")
+                .countryCode("+56")
+                .phone("989421155")
+                .active(true)
+                .roles(Set.of(role))
+                .build();
+
+        when(userUseCase.create(any(), anyLong(), anyString())).thenReturn(user);
+
+        mockMvc.perform(post("/api/users")
+                        .contentType(APPLICATION_JSON)
+                        .content(validCreateUserRequestJson()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Pablo"))
+                .andExpect(jsonPath("$.lastName").value("Gallegos"))
+                .andExpect(jsonPath("$.email").value("pgallegoscelis86@gmail.com"))
+                .andExpect(jsonPath("$.active").value(true));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@ats.local", authorities = {"USER_CREATE"})
+    void createUserShouldReturn409WhenEmailAlreadyExists() throws Exception {
+        when(userUseCase.create(any(), anyLong(), anyString()))
+                .thenThrow(new EmailAlreadyExistException("Email already registered: existing@test.com"));
+
+        mockMvc.perform(post("/api/users")
+                        .contentType(APPLICATION_JSON)
+                        .content(validCreateUserRequestJson()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("USER_ALREADY_EXISTS"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@ats.local", authorities = {"USER_CREATE"})
+    void createUserShouldReturn400WhenRoleIsNotFound() throws Exception {
+        when(userUseCase.create(any(), anyLong(), anyString()))
+                .thenThrow(new RoleNotAvailableException("Role not found: 99"));
+
+        mockMvc.perform(post("/api/users")
+                        .contentType(APPLICATION_JSON)
+                        .content(validCreateUserRequestJson()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("ROLE_NOT_AVAILABLE"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@ats.local", authorities = {"USER_CREATE"})
+    void createUserShouldReturn400WhenRoleIsInactive() throws Exception {
+        when(userUseCase.create(any(), anyLong(), anyString()))
+                .thenThrow(new RoleNotAvailableException("Role is not active: 3"));
+
+        mockMvc.perform(post("/api/users")
+                        .contentType(APPLICATION_JSON)
+                        .content(validCreateUserRequestJson()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("ROLE_NOT_AVAILABLE"));
+    }
+
+    @Test
+    @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_READ"})
+    void createUserShouldReturn403WhenUserDoesNotHaveCreatePermission() throws Exception {
+        mockMvc.perform(post("/api/users")
+                        .contentType(APPLICATION_JSON)
+                        .content(validCreateUserRequestJson()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+    }
+
+    @Test
+    void createUserShouldReturn401WhenUnauthenticated() throws Exception {
+        mockMvc.perform(post("/api/users")
+                        .contentType(APPLICATION_JSON)
+                        .content(validCreateUserRequestJson()))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+    }
+
+    private String validCreateUserRequestJson() {
+        return """
+                {
+                  "name": "Pablo",
+                  "lastName": "Gallegos",
+                  "email": "pgallegoscelis86@gmail.com",
+                  "countryCode": "+56",
+                  "phone": "989421155",
+                  "password": "Clave12345",
+                  "roleId": 2
+                }
+                """;
+    }
+}

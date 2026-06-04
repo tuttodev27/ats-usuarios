@@ -6,7 +6,7 @@ import com.ats.user.domain.model.User;
 import java.util.List;
 
 public interface UserUseCase {
-    User create(User user, String roleName, String rawPassword);
+    User create(User user, Long roleId, String rawPassword);
     User getById(Long id);
     List<User> listUsers(Boolean active);
     List<Role> listAvailableRoles();

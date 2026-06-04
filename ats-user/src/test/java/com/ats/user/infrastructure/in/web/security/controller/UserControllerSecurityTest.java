@@ -86,7 +86,7 @@ class UserControllerSecurityTest {
     @Test
     @WithMockUser(username = "admin@ats.local", authorities = {"USER_CREATE"})
     void saveUserShouldReturn201WhenUserHasCreatePermission() throws Exception {
-        when(userUseCase.create(any(), anyString(), anyString()))
+        when(userUseCase.create(any(), anyLong(), anyString()))
                 .thenReturn(UserDumpData.domainUserExisting());
 
         mockMvc.perform(post("/api/users")
@@ -262,7 +262,7 @@ class UserControllerSecurityTest {
                   "countryCode": "+56",
                   "phone": "989421155",
                   "password": "Clave12345",
-                  "role": "RECRUITER"
+                  "roleId": 2
                 }
                 """;
     }

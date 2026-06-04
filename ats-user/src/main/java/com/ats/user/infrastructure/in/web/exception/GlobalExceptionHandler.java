@@ -8,6 +8,7 @@ import com.ats.user.domain.exception.ModuleAlreadyExistsException;
 import com.ats.user.domain.exception.ModuleNotFoundException;
 import com.ats.user.domain.exception.PermissionNotFoundException;
 import com.ats.user.domain.exception.RoleAlreadyExistsException;
+import com.ats.user.domain.exception.RoleNotAvailableException;
 import com.ats.user.domain.exception.RoleNotFoundException;
 import com.ats.user.domain.exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +30,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = {EmailAlreadyExistException.class})
     public ResponseEntity<ErrorResponse> handleEmailExists(EmailAlreadyExistException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                new ErrorResponse(Instant.now(), 409, "EMAIL_ALREADY_EXISTS", ex.getMessage(), request.getRequestURI())
+                new ErrorResponse(Instant.now(), 409, "USER_ALREADY_EXISTS", ex.getMessage(), request.getRequestURI())
         );
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -61,6 +62,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRoleAlreadyExists(RoleAlreadyExistsException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 new ErrorResponse(Instant.now(), 409, "ROLE_ALREADY_EXISTS", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(RoleNotAvailableException.class)
+    public ResponseEntity<ErrorResponse> handleRoleNotAvailable(RoleNotAvailableException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ErrorResponse(Instant.now(), 400, "ROLE_NOT_AVAILABLE", ex.getMessage(), request.getRequestURI())
         );
     }
 

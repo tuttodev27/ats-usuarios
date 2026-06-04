@@ -2,7 +2,7 @@ package com.ats.user.application.service;
 
 import com.ats.user.application.service.password.PasswordPolicy;
 import com.ats.user.domain.exception.EmailAlreadyExistException;
-import com.ats.user.domain.exception.RoleNotFoundException;
+import com.ats.user.domain.exception.RoleNotAvailableException;
 import com.ats.user.domain.exception.UserNotFoundException;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.model.User;
@@ -35,13 +35,16 @@ public class UserService implements UserUseCase {
     }
 
     @Override
-    public User create(User user, String roleName, String rawPassword) {
+    public User create(User user, Long roleId, String rawPassword) {
         if(userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new EmailAlreadyExistException("Email already registered: " + user.getEmail());
         }
         passwordPolicy.validate(rawPassword);
-        var role = roleRepository.findActiveByName(roleName)
-                .orElseThrow(() -> new RoleNotFoundException("Active role not found: " + roleName));
+        var role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RoleNotAvailableException("Role not found: " + roleId));
+        if (!role.isActive()) {
+            throw new RoleNotAvailableException("Role is not active: " + roleId);
+        }
 
         user.setRoles(Set.of(role));
         user.setPasswordHash(passwordHasher.encode(rawPassword));
