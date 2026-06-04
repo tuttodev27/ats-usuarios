@@ -27,9 +27,7 @@ public interface RoleWebMapper {
     Role toDomain(CreateRoleRequest request);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "name", source = "request.name")
-    @Mapping(target = "description", source = "request.description")
-    @Mapping(target = "active", source = "request.active")
+    @Mapping(target = "active", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)

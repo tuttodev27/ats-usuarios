@@ -116,7 +116,7 @@ public class RoleController {
     @PutMapping("/{id}")
     @Operation(
             summary = "Actualizar rol",
-            description = "Actualiza nombre, descripcion y estado activo del rol."
+            description = "Actualiza nombre y descripcion del rol."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rol actualizado",
@@ -141,8 +141,7 @@ public class RoleController {
                             examples = @ExampleObject(value = """
                                     {
                                       "name": "ADMIN",
-                                      "description": "Rol administrador",
-                                      "active": true
+                                      "description": "Rol administrador"
                                     }
                                     """)
                     )
