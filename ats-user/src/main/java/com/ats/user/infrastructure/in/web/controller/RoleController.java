@@ -7,6 +7,7 @@ import com.ats.user.infrastructure.in.web.dto.request.CreateRoleRequest;
 import com.ats.user.infrastructure.in.web.dto.request.UpdateRoleRequest;
 import com.ats.user.infrastructure.in.web.dto.request.UpdateRoleStatusRequest;
 import com.ats.user.infrastructure.in.web.dto.response.PagedResponse;
+import com.ats.user.infrastructure.in.web.dto.response.RoleDetailResponse;
 import com.ats.user.infrastructure.in.web.dto.response.RolePermissionsResponse;
 import com.ats.user.infrastructure.in.web.dto.response.RoleResponse;
 import com.ats.user.infrastructure.in.web.exception.ErrorResponse;
@@ -94,22 +95,22 @@ public class RoleController {
     @GetMapping("/{id}")
     @Operation(
             summary = "Obtener rol por ID",
-            description = "Retorna un rol especifico por su identificador."
+            description = "Retorna un rol especifico por su identificador con sus permisos asociados."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rol encontrado",
-                    content = @Content(schema = @Schema(implementation = RoleResponse.class))),
+                    content = @Content(schema = @Schema(implementation = RoleDetailResponse.class))),
             @ApiResponse(responseCode = "404", description = "Rol no encontrado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "No autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<RoleResponse> getById(
+    public ResponseEntity<RoleDetailResponse> getById(
             @Parameter(description = "ID del rol", example = "1")
             @PathVariable Long id
     ) {
         var role = roleUseCase.getById(id);
-        return ResponseEntity.ok(roleWebMapper.toResponse(role));
+        return ResponseEntity.ok(roleWebMapper.toDetailResponse(role));
     }
 
     @PutMapping("/{id}")
