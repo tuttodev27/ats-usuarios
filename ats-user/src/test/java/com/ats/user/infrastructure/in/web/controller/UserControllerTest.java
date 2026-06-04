@@ -3,6 +3,7 @@ package com.ats.user.infrastructure.in.web.controller;
 import com.ats.user.AtsUserApplication;
 import com.ats.user.domain.exception.EmailAlreadyExistException;
 import com.ats.user.domain.exception.RoleNotAvailableException;
+import com.ats.user.domain.exception.UserNotFoundException;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.model.User;
 import com.ats.user.domain.port.in.UserUseCase;
@@ -26,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -147,6 +149,59 @@ class UserControllerTest {
                         .content(validCreateUserRequestJson()))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@ats.local", authorities = {"USER_READ"})
+    void getUserByIdShouldReturn200WhenUserExists() throws Exception {
+        var role = Role.builder().id(1L).name("ADMIN").active(true).build();
+        var user = User.builder()
+                .id(1L)
+                .name("System")
+                .lastName("Admin")
+                .email("admin@ats.local")
+                .countryCode("+57")
+                .phone("3001002000")
+                .active(true)
+                .roles(Set.of(role))
+                .build();
+
+        when(userUseCase.getById(1L)).thenReturn(user);
+
+        mockMvc.perform(get("/api/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("System"))
+                .andExpect(jsonPath("$.lastName").value("Admin"))
+                .andExpect(jsonPath("$.email").value("admin@ats.local"))
+                .andExpect(jsonPath("$.active").value(true))
+                .andExpect(jsonPath("$.roles[0]").value("ADMIN"))
+                .andExpect(jsonPath("$.password").doesNotExist());
+    }
+
+    @Test
+    @WithMockUser(username = "admin@ats.local", authorities = {"USER_READ"})
+    void getUserByIdShouldReturn404WhenUserNotFound() throws Exception {
+        when(userUseCase.getById(99L)).thenThrow(new UserNotFoundException("User not found: 99"));
+
+        mockMvc.perform(get("/api/users/99"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("USER_NOT_FOUND"));
+    }
+
+    @Test
+    void getUserByIdShouldReturn401WhenUnauthenticated() throws Exception {
+        mockMvc.perform(get("/api/users/1"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+    }
+
+    @Test
+    @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_UPDATE"})
+    void getUserByIdShouldReturn403WhenUserDoesNotHaveReadPermission() throws Exception {
+        mockMvc.perform(get("/api/users/1"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
     }
 
     private String validCreateUserRequestJson() {
