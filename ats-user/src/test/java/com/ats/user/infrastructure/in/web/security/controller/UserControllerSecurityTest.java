@@ -281,8 +281,7 @@ class UserControllerSecurityTest {
                   "name": "Pablo Updated",
                   "lastName": "Gallegos Updated",
                   "countryCode": "+51",
-                  "phone": "987123123",
-                  "active": true
+                  "phone": "987123123"
                 }
                 """;
     }

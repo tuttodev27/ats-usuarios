@@ -172,7 +172,6 @@ class UserServiceTest {
         assertEquals("Gallegos Updated", updated.getLastName());
         assertEquals("+51", updated.getCountryCode());
         assertEquals("987123123", updated.getPhone());
-        assertEquals(false, updated.getActive());
         assertNotNull(updated.getUpdatedAt());
     }
 

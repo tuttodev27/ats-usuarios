@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -202,6 +203,77 @@ class UserControllerTest {
         mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@ats.local", authorities = {"USER_UPDATE"})
+    void updateUserShouldReturn200WhenRequestIsValid() throws Exception {
+        var role = Role.builder().id(1L).name("ADMIN").active(true).build();
+        var updatedUser = User.builder()
+                .id(1L)
+                .name("Pablo Updated")
+                .lastName("Gallegos Updated")
+                .email("admin@ats.local")
+                .countryCode("+51")
+                .phone("987123123")
+                .active(true)
+                .roles(Set.of(role))
+                .build();
+
+        when(userUseCase.update(anyLong(), any())).thenReturn(updatedUser);
+
+        mockMvc.perform(put("/api/users/1")
+                        .contentType(APPLICATION_JSON)
+                        .content(validUpdateUserRequestJson()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Pablo Updated"))
+                .andExpect(jsonPath("$.lastName").value("Gallegos Updated"))
+                .andExpect(jsonPath("$.countryCode").value("+51"))
+                .andExpect(jsonPath("$.phone").value("987123123"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@ats.local", authorities = {"USER_UPDATE"})
+    void updateUserShouldReturn404WhenUserNotFound() throws Exception {
+        when(userUseCase.update(anyLong(), any()))
+                .thenThrow(new UserNotFoundException("User not found: 99"));
+
+        mockMvc.perform(put("/api/users/99")
+                        .contentType(APPLICATION_JSON)
+                        .content(validUpdateUserRequestJson()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("USER_NOT_FOUND"));
+    }
+
+    @Test
+    void updateUserShouldReturn401WhenUnauthenticated() throws Exception {
+        mockMvc.perform(put("/api/users/1")
+                        .contentType(APPLICATION_JSON)
+                        .content(validUpdateUserRequestJson()))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+    }
+
+    @Test
+    @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_READ"})
+    void updateUserShouldReturn403WhenUserDoesNotHaveUpdatePermission() throws Exception {
+        mockMvc.perform(put("/api/users/1")
+                        .contentType(APPLICATION_JSON)
+                        .content(validUpdateUserRequestJson()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+    }
+
+    private String validUpdateUserRequestJson() {
+        return """
+                {
+                  "name": "Pablo Updated",
+                  "lastName": "Gallegos Updated",
+                  "countryCode": "+51",
+                  "phone": "987123123"
+                }
+                """;
     }
 
     private String validCreateUserRequestJson() {
