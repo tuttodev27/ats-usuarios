@@ -3,6 +3,7 @@ package com.ats.user.infrastructure.in.web.mapper;
 import com.ats.user.domain.model.Role;
 import com.ats.user.infrastructure.in.web.dto.request.CreateRoleRequest;
 import com.ats.user.infrastructure.in.web.dto.request.UpdateRoleRequest;
+import com.ats.user.infrastructure.in.web.dto.response.RoleDetailResponse;
 import com.ats.user.infrastructure.in.web.dto.response.RolePermissionsResponse;
 import com.ats.user.infrastructure.in.web.dto.response.RoleResponse;
 import org.mapstruct.Mapper;
@@ -11,7 +12,7 @@ import org.mapstruct.Mapping;
 import java.util.Comparator;
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = PermissionWebMapper.class)
 public interface RoleWebMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -38,6 +39,8 @@ public interface RoleWebMapper {
 
     @Mapping(target = "permissionsCount", expression = "java(role.getPermissions() != null ? role.getPermissions().size() : 0)")
     RoleResponse toResponse(Role role);
+
+    RoleDetailResponse toDetailResponse(Role role);
 
     default RolePermissionsResponse toPermissionsResponse(Role role) {
         List<Long> permissionIds = role.getPermissions().stream()
