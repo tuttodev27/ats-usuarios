@@ -16,18 +16,19 @@
 BEGIN;
 
 -- 1) Nuevos permisos del modulo ATS
-INSERT INTO permissions (code, resource, action, scope, description, active, created_at, updated_at, created_by, updated_by, module_id)
+INSERT INTO permissions (code, name, resource, action, scope, description, active, created_at, updated_at, created_by, updated_by, module_id)
 VALUES
-    ('CANDIDATE_CREATE', 'candidates', 'create', 'global', 'Crear candidato', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
-    ('CANDIDATE_READ',   'candidates', 'read',   'global', 'Consultar candidato', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
-    ('CANDIDATE_UPDATE', 'candidates', 'update', 'global', 'Actualizar candidato', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
-    ('CANDIDATE_DELETE', 'candidates', 'delete', 'global', 'Desactivar candidato', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
-    ('SOLICITUD_CREATE', 'solicitudes', 'create', 'global', 'Crear solicitud', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
-    ('SOLICITUD_READ',   'solicitudes', 'read',   'global', 'Consultar solicitud', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
-    ('SOLICITUD_UPDATE', 'solicitudes', 'update', 'global', 'Actualizar solicitud', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
-    ('SOLICITUD_DELETE', 'solicitudes', 'delete', 'global', 'Desactivar solicitud', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
-    ('MATCH_RUN',        'matching',   'run',    'global', 'Ejecutar matching de candidatos', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS'))
+    ('CANDIDATE_CREATE', 'Crear Candidato', 'candidates', 'create', 'global', 'Crear candidato', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('CANDIDATE_READ',   'Ver Candidatos',  'candidates', 'read',   'global', 'Consultar candidato', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('CANDIDATE_UPDATE', 'Editar Candidato', 'candidates', 'update', 'global', 'Actualizar candidato', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('CANDIDATE_DELETE', 'Desactivar Candidato', 'candidates', 'delete', 'global', 'Desactivar candidato', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('SOLICITUD_CREATE', 'Crear Solicitud', 'solicitudes', 'create', 'global', 'Crear solicitud', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('SOLICITUD_READ',   'Ver Solicitudes', 'solicitudes', 'read',   'global', 'Consultar solicitud', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('SOLICITUD_UPDATE', 'Editar Solicitud', 'solicitudes', 'update', 'global', 'Actualizar solicitud', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('SOLICITUD_DELETE', 'Desactivar Solicitud', 'solicitudes', 'delete', 'global', 'Desactivar solicitud', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('MATCH_RUN',        'Ejecutar Matching', 'matching', 'run',    'global', 'Ejecutar matching de candidatos', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS'))
 ON CONFLICT (code) DO UPDATE SET
+    name = EXCLUDED.name,
     description = EXCLUDED.description,
     active = EXCLUDED.active,
     updated_at = NOW(),

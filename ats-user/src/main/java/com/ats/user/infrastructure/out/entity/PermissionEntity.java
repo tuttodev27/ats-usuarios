@@ -41,6 +41,9 @@ public class PermissionEntity {
     String code;
 
     @Column(length = 120)
+    String name;
+
+    @Column(length = 120)
     String resource;
 
     @Column(length = 60)

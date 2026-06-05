@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface PermissionRepositoryPort {
     List<Permission> findAllByIds(List<Long> ids);
+    List<Permission> findAll(Long moduleId, Boolean active);
     List<Permission> findAll();
     Optional<Permission> findById(Long id);
 }

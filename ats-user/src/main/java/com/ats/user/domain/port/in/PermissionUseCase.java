@@ -5,5 +5,5 @@ import com.ats.user.domain.model.Permission;
 import java.util.List;
 
 public interface PermissionUseCase {
-    List<Permission> list();
+    List<Permission> list(Long moduleId, Boolean active);
 }
