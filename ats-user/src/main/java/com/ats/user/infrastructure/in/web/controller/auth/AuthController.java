@@ -3,11 +3,16 @@ package com.ats.user.infrastructure.in.web.controller.auth;
 import com.ats.user.domain.exception.UserNotFoundException;
 import com.ats.user.infrastructure.in.web.dto.request.LoginRequest;
 import com.ats.user.infrastructure.in.web.dto.response.LoginResponse;
+import com.ats.user.infrastructure.in.web.exception.ErrorResponse;
 import com.ats.user.infrastructure.in.web.security.jwt.JwtService;
 import com.ats.user.infrastructure.out.entity.RoleEntity;
 import com.ats.user.infrastructure.out.entity.RolePermissionEntity;
 import com.ats.user.infrastructure.out.repository.UserJpaRepository;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,6 +54,14 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "Iniciar sesion", description = "Autentica usuario por email/password y devuelve token JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Autenticacion exitosa, retorna JWT",
+                    content = @Content(schema = @Schema(implementation = LoginResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Credenciales invalidas",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "No autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     public LoginResponse login(@Valid @RequestBody LoginRequest request) {
 
         authenticationManager.authenticate(
