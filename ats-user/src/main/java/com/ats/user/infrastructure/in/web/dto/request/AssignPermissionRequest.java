@@ -7,6 +7,11 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
+@Schema(example = """
+        {
+          "permissionIds": [1, 2, 3]
+        }
+        """)
 public record AssignPermissionRequest(
         @ArraySchema(
                 schema = @Schema(implementation = Long.class),
