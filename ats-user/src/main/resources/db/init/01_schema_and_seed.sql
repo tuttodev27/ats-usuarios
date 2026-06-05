@@ -120,6 +120,8 @@ VALUES
     ('USER_READ',   'Ver Usuarios',  'users', 'read',   'global', 'Consultar usuario', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
     ('USER_UPDATE', 'Editar Usuario', 'users', 'update', 'global', 'Actualizar usuario', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
     ('USER_DELETE', 'Desactivar Usuario', 'users', 'delete', 'global', 'Desactivar usuario', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
+    ('USER_STATUS_UPDATE', 'Estado de Usuario', 'users', 'status-update', 'global', 'Activar o desactivar usuario', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
+    ('USER_ROLE_UPDATE', 'Cambiar Rol de Usuario', 'users', 'role-update', 'global', 'Asignar o cambiar el rol de un usuario', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
     ('ROLE_CREATE', 'Crear Rol', 'roles', 'create', 'global', 'Crear rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
     ('ROLE_READ', 'Ver Roles', 'roles', 'read', 'global', 'Consultar rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
     ('ROLE_UPDATE', 'Editar Rol', 'roles', 'update', 'global', 'Actualizar rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
@@ -127,14 +129,17 @@ VALUES
     ('ROLE_STATUS_UPDATE', 'Estado de Rol', 'roles', 'status-update', 'global', 'Actualizar estado de rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
     ('ROLE_PERMISSION_ASSIGN', 'Asignar Permisos a Rol', 'role-permissions', 'assign', 'global', 'Asignar permisos a rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
     ('ROLE_PERMISSION_REMOVE', 'Quitar Permisos de Rol', 'role-permissions', 'remove', 'global', 'Quitar permisos de rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
+    ('ROLE_PERMISSION_READ', 'Ver Permisos del Rol', 'role-permissions', 'read', 'global', 'Consultar permisos asignados a un rol', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'USER')),
     ('MODULE_CREATE', 'Crear Módulo', 'modules', 'create', 'global', 'Crear modulo', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
     ('MODULE_READ', 'Ver Módulos', 'modules', 'read', 'global', 'Consultar modulos', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
     ('MODULE_UPDATE', 'Editar Módulo', 'modules', 'update', 'global', 'Actualizar modulo', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
     ('MODULE_DELETE', 'Desactivar Módulo', 'modules', 'delete', 'global', 'Desactivar modulo', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('MODULE_STATUS_UPDATE', 'Estado de Módulo', 'modules', 'status-update', 'global', 'Activar o desactivar modulo', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
     ('MENU_CREATE', 'Crear Menú', 'menus', 'create', 'global', 'Crear menu', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
     ('MENU_READ', 'Ver Menús', 'menus', 'read', 'global', 'Consultar menus', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
     ('MENU_UPDATE', 'Editar Menú', 'menus', 'update', 'global', 'Actualizar menu', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
     ('MENU_DELETE', 'Desactivar Menú', 'menus', 'delete', 'global', 'Desactivar menu', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
+    ('MENU_STATUS_UPDATE', 'Estado de Menú', 'menus', 'status-update', 'global', 'Activar o desactivar menu', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
     ('PERMISSION_READ', 'Ver Permisos', 'permissions', 'read', 'global', 'Consultar catalogo de permisos', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS')),
     ('ATS_DASHBOARD_VIEW', 'Ver Dashboard', 'dashboard', 'read', 'global', 'Ver dashboard ATS', TRUE, NOW(), NOW(), 1, 1, (SELECT id FROM modules WHERE code = 'ATS'))
 ON CONFLICT (code) DO UPDATE SET
@@ -199,6 +204,8 @@ JOIN permissions p ON p.code IN (
     'USER_READ',
     'USER_UPDATE',
     'USER_DELETE',
+    'USER_STATUS_UPDATE',
+    'USER_ROLE_UPDATE',
     'ROLE_CREATE',
     'ROLE_READ',
     'ROLE_UPDATE',
@@ -206,14 +213,17 @@ JOIN permissions p ON p.code IN (
     'ROLE_STATUS_UPDATE',
     'ROLE_PERMISSION_ASSIGN',
     'ROLE_PERMISSION_REMOVE',
+    'ROLE_PERMISSION_READ',
     'MODULE_CREATE',
     'MODULE_READ',
     'MODULE_UPDATE',
     'MODULE_DELETE',
+    'MODULE_STATUS_UPDATE',
     'MENU_CREATE',
     'MENU_READ',
     'MENU_UPDATE',
     'MENU_DELETE',
+    'MENU_STATUS_UPDATE',
     'PERMISSION_READ',
     'ATS_DASHBOARD_VIEW'
 )
@@ -225,20 +235,23 @@ ON CONFLICT (role_id, permission_id) DO UPDATE SET
 INSERT INTO role_permissions (role_id, permission_id, active, created_at, updated_at)
 SELECT r.id, p.id, TRUE, NOW(), NOW()
 FROM roles r
-JOIN permissions p ON p.code IN ('ATS_DASHBOARD_VIEW')
+JOIN permissions p ON p.code IN ('ATS_DASHBOARD_VIEW', 'PERMISSION_READ')
 WHERE r.name = 'RECRUITER'
 ON CONFLICT (role_id, permission_id) DO UPDATE SET
     active = TRUE,
     updated_at = NOW();
 
+-- Ensure RECRUITER only has the explicitly granted permissions active
 UPDATE role_permissions rp
 SET active = FALSE,
     updated_at = NOW()
-FROM roles r, permissions p
+FROM roles r
 WHERE rp.role_id = r.id
-  AND rp.permission_id = p.id
   AND r.name = 'RECRUITER'
-  AND p.code = 'USER_READ';
+  AND rp.permission_id NOT IN (
+      SELECT p.id FROM permissions p
+      WHERE p.code IN ('ATS_DASHBOARD_VIEW', 'PERMISSION_READ')
+  );
 
 -- User-Role mapping
 INSERT INTO user_roles (user_id, role_id)
