@@ -5,6 +5,7 @@ import com.ats.user.infrastructure.in.web.dto.response.PermissionResponse;
 import com.ats.user.infrastructure.in.web.exception.ErrorResponse;
 import com.ats.user.infrastructure.in.web.mapper.PermissionWebMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -40,8 +42,12 @@ public class PermissionController {
             @ApiResponse(responseCode = "403", description = "Sin permisos",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<List<PermissionResponse>> list() {
-        var permissions = permissionUseCase.list().stream()
+    public ResponseEntity<List<PermissionResponse>> list(
+            @Parameter(description = "Filtrar por ID de modulo")
+            @RequestParam(required = false) Long moduleId,
+            @Parameter(description = "Filtrar por estado activo")
+            @RequestParam(required = false) Boolean active) {
+        var permissions = permissionUseCase.list(moduleId, active).stream()
                 .map(permissionWebMapper::toResponse)
                 .toList();
         return ResponseEntity.ok(permissions);

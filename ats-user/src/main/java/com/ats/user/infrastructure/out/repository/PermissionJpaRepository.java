@@ -10,6 +10,15 @@ public interface PermissionJpaRepository extends JpaRepository<PermissionEntity,
     @Query("""
             select p from PermissionEntity p
             join fetch p.module m
+            where (:moduleId is null or m.id = :moduleId)
+            and (:active is null or p.active = :active)
+            order by m.code asc, p.code asc
+            """)
+    List<PermissionEntity> findAllFiltered(Long moduleId, Boolean active);
+
+    @Query("""
+            select p from PermissionEntity p
+            join fetch p.module m
             order by m.code asc, p.code asc
             """)
     List<PermissionEntity> findAllWithModuleOrderByModuleCodeAscCodeAsc();

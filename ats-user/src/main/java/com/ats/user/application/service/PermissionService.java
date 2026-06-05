@@ -17,7 +17,10 @@ public class PermissionService implements PermissionUseCase {
     }
 
     @Override
-    public List<Permission> list() {
-        return permissionRepository.findAll();
+    public List<Permission> list(Long moduleId, Boolean active) {
+        if (moduleId == null && active == null) {
+            return permissionRepository.findAll();
+        }
+        return permissionRepository.findAll(moduleId, active);
     }
 }

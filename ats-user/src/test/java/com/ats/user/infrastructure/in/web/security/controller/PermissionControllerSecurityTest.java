@@ -74,14 +74,51 @@ class PermissionControllerSecurityTest {
     @Test
     @WithMockUser(authorities = {"PERMISSION_READ"})
     void listShouldReturn200WhenUserHasPermissionRead() throws Exception {
-        when(permissionUseCase.list()).thenReturn(List.of(
-                Permission.builder().id(1L).code("USER_READ").active(true).build(),
-                Permission.builder().id(2L).code("ROLE_READ").active(true).build()
+        when(permissionUseCase.list(null, null)).thenReturn(List.of(
+                Permission.builder().id(1L).code("USER_READ").name("Ver Usuarios").active(true).build(),
+                Permission.builder().id(2L).code("ROLE_READ").name("Ver Roles").active(true).build()
         ));
 
         mockMvc.perform(get("/api/permissions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].code").value("USER_READ"))
                 .andExpect(jsonPath("$[1].code").value("ROLE_READ"));
+    }
+
+    @Test
+    @WithMockUser(authorities = {"PERMISSION_READ"})
+    void listShouldFilterByModuleId() throws Exception {
+        when(permissionUseCase.list(1L, null)).thenReturn(List.of(
+                Permission.builder().id(1L).code("USER_READ").name("Ver Usuarios").moduleId(1L).active(true).build()
+        ));
+
+        mockMvc.perform(get("/api/permissions?moduleId=1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].code").value("USER_READ"))
+                .andExpect(jsonPath("$.length()").value(1));
+    }
+
+    @Test
+    @WithMockUser(authorities = {"PERMISSION_READ"})
+    void listShouldFilterByActive() throws Exception {
+        when(permissionUseCase.list(null, true)).thenReturn(List.of(
+                Permission.builder().id(1L).code("USER_READ").name("Ver Usuarios").active(true).build()
+        ));
+
+        mockMvc.perform(get("/api/permissions?active=true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].code").value("USER_READ"));
+    }
+
+    @Test
+    @WithMockUser(authorities = {"PERMISSION_READ"})
+    void listShouldFilterByModuleIdAndActive() throws Exception {
+        when(permissionUseCase.list(1L, true)).thenReturn(List.of(
+                Permission.builder().id(1L).code("USER_READ").name("Ver Usuarios").moduleId(1L).active(true).build()
+        ));
+
+        mockMvc.perform(get("/api/permissions?moduleId=1&active=true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
     }
 }

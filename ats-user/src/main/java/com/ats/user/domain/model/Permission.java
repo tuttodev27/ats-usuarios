@@ -22,20 +22,19 @@ public class Permission {
     @EqualsAndHashCode.Include
     Long id;
     String code;
+    String name;
     String resource;
     String action;
     String scope;
     String description;
     Long moduleId;
+    String moduleCode;
+    String moduleName;
     boolean active;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     Long createdBy;
     Long updatedBy;
-
-
-
-
 
 }
 
