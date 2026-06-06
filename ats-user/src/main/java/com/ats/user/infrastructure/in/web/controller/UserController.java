@@ -128,9 +128,10 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar usuario (borrado logico)")
+    @Operation(summary = "Desactivar usuario (borrado logico)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Usuario eliminado logicamente"),
+            @ApiResponse(responseCode = "200", description = "Usuario desactivado",
+                    content = @Content(schema = @Schema(implementation = UserResponse.class))),
             @ApiResponse(responseCode = "401", description = "No autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "Sin permisos",
@@ -138,9 +139,9 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        userUseCase.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<UserResponse> delete(@PathVariable Long id) {
+        var user = userUseCase.delete(id);
+        return ResponseEntity.ok(userWebMapper.toResponse(user));
     }
 
     @PutMapping("/{id}")

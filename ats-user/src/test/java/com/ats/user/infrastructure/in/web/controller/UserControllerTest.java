@@ -67,7 +67,7 @@ class UserControllerTest {
     private MenuJpaRepository menuJpaRepository;
 
     @Test
-    @WithMockUser(username = "admin@ats.local", authorities = {"USER_CREATE"})
+    @WithMockUser(username = "admin@ats.local", authorities = {"ROLE_ADMIN", "USER_CREATE"})
     void createUserShouldReturn201WhenRequestIsValid() throws Exception {
         var role = Role.builder().id(2L).name("RECRUITER").active(true).build();
         var user = User.builder()
@@ -95,7 +95,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", authorities = {"USER_CREATE"})
+    @WithMockUser(username = "admin@ats.local", authorities = {"ROLE_ADMIN", "USER_CREATE"})
     void createUserShouldReturn409WhenEmailAlreadyExists() throws Exception {
         when(userUseCase.create(any(), anyLong(), anyString()))
                 .thenThrow(new EmailAlreadyExistException("Email already registered: existing@test.com"));
@@ -108,7 +108,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", authorities = {"USER_CREATE"})
+    @WithMockUser(username = "admin@ats.local", authorities = {"ROLE_ADMIN", "USER_CREATE"})
     void createUserShouldReturn400WhenRoleIsNotFound() throws Exception {
         when(userUseCase.create(any(), anyLong(), anyString()))
                 .thenThrow(new RoleNotAvailableException("Role not found: 99"));
@@ -121,7 +121,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", authorities = {"USER_CREATE"})
+    @WithMockUser(username = "admin@ats.local", authorities = {"ROLE_ADMIN", "USER_CREATE"})
     void createUserShouldReturn400WhenRoleIsInactive() throws Exception {
         when(userUseCase.create(any(), anyLong(), anyString()))
                 .thenThrow(new RoleNotAvailableException("Role is not active: 3"));
@@ -153,7 +153,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", authorities = {"USER_READ"})
+    @WithMockUser(username = "admin@ats.local", authorities = {"ROLE_ADMIN", "USER_READ"})
     void getUserByIdShouldReturn200WhenUserExists() throws Exception {
         var role = Role.builder().id(1L).name("ADMIN").active(true).build();
         var user = User.builder()
@@ -181,7 +181,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", authorities = {"USER_READ"})
+    @WithMockUser(username = "admin@ats.local", authorities = {"ROLE_ADMIN", "USER_READ"})
     void getUserByIdShouldReturn404WhenUserNotFound() throws Exception {
         when(userUseCase.getById(99L)).thenThrow(new UserNotFoundException("User not found: 99"));
 
@@ -206,7 +206,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", authorities = {"USER_UPDATE"})
+    @WithMockUser(username = "admin@ats.local", authorities = {"ROLE_ADMIN", "USER_UPDATE"})
     void updateUserShouldReturn200WhenRequestIsValid() throws Exception {
         var role = Role.builder().id(1L).name("ADMIN").active(true).build();
         var updatedUser = User.builder()
@@ -234,7 +234,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", authorities = {"USER_UPDATE"})
+    @WithMockUser(username = "admin@ats.local", authorities = {"ROLE_ADMIN", "USER_UPDATE"})
     void updateUserShouldReturn404WhenUserNotFound() throws Exception {
         when(userUseCase.update(anyLong(), any()))
                 .thenThrow(new UserNotFoundException("User not found: 99"));

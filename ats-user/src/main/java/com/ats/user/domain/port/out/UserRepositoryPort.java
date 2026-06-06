@@ -16,5 +16,5 @@ public interface UserRepositoryPort {
     List<User> findAllByActive(boolean active);
     Page<User> searchUsers(String search, Boolean active, PageQuery pageQuery);
     boolean existsById(Long id);
-    void delete(Long id);
+    User delete(Long id);
 }
