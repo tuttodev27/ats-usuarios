@@ -53,14 +53,7 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/api/users").hasAuthority("USER_CREATE")
-                        .requestMatchers(HttpMethod.GET, "/api/users").hasAuthority("USER_READ")
-                        .requestMatchers(HttpMethod.GET, "/api/users/roles").hasAnyAuthority("USER_READ", "USER_UPDATE")
-                        .requestMatchers(HttpMethod.GET, "/api/users/*").hasAuthority("USER_READ")
-                        .requestMatchers(HttpMethod.PUT, "/api/users/*/roles").hasAuthority("USER_ROLE_UPDATE")
-                        .requestMatchers(HttpMethod.PUT, "/api/users/*").hasAuthority("USER_UPDATE")
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/*").hasAuthority("USER_DELETE")
-                        .requestMatchers(HttpMethod.PATCH, "/api/users/*/status").hasAuthority("USER_STATUS_UPDATE")
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.POST, "/api/roles").hasAuthority("ROLE_CREATE")
                         .requestMatchers(HttpMethod.GET, "/api/roles").hasAuthority("ROLE_READ")

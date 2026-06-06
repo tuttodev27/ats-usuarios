@@ -75,10 +75,10 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public void delete(Long id) {
+    public User delete(Long id) {
         var entity= userJpaRepository.findById(id)
                 .orElseThrow(()-> new UserNotFoundException("User not found: " + id));
         entity.setActive(false);
-        userJpaRepository.save(entity);
+        return userMapper.toDomain(userJpaRepository.save(entity));
     }
 }

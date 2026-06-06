@@ -177,10 +177,16 @@ class UserServiceTest {
 
     @Test
     void deleteShouldCallRepositoryDeleteWhenExists() {
+        User existing = UserDumpData.domainUserExisting();
+        User deactivated = UserDumpData.domainUserExisting();
+        deactivated.setActive(false);
         when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.delete(1L)).thenReturn(deactivated);
 
-        userService.delete(1L);
+        User result = userService.delete(1L);
 
+        assertNotNull(result);
+        assertEquals(false, result.getActive());
         verify(userRepository).delete(1L);
     }
 

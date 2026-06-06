@@ -111,10 +111,10 @@ public class UserService implements UserUseCase {
     }
 
     @Override
-    public void delete(Long id) {
+    public User delete(Long id) {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User not found: " + id);
         }
-        userRepository.delete(id);
+        return userRepository.delete(id);
     }
 }
