@@ -11,6 +11,7 @@ import com.ats.user.domain.port.in.RoleUseCase;
 import com.ats.user.domain.port.out.PermissionRepositoryPort;
 import com.ats.user.domain.port.out.RoleRepositoryPort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@Transactional(readOnly = true)
 public class RoleService implements RoleUseCase {
 
     private final RoleRepositoryPort roleRepository;
@@ -31,6 +33,7 @@ public class RoleService implements RoleUseCase {
     }
 
     @Override
+    @Transactional
     public Role create(Role role) {
         String normalizedName = normalizeName(role.getName());
         if (roleRepository.existsByNameIgnoreCase(normalizedName)) {
@@ -61,6 +64,7 @@ public class RoleService implements RoleUseCase {
     }
 
     @Override
+    @Transactional
     public Role update(Long id, Role role) {
         Role current = roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + id));
@@ -79,6 +83,7 @@ public class RoleService implements RoleUseCase {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         Role current = roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + id));
@@ -88,6 +93,7 @@ public class RoleService implements RoleUseCase {
     }
 
     @Override
+    @Transactional
     public Role assignPermissions(Long roleId, List<Long> permissionIds) {
         if (permissionIds == null) {
             throw new IllegalArgumentException("Permission ids are required");
@@ -114,6 +120,7 @@ public class RoleService implements RoleUseCase {
     }
 
     @Override
+    @Transactional
     public Role updateStatus(Long id, boolean active) {
         Role current = roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + id));
@@ -123,6 +130,7 @@ public class RoleService implements RoleUseCase {
     }
 
     @Override
+    @Transactional
     public Role deletePermissions(Long roleId, List<Long> permissionIds) {
         Role role= roleRepository.findById(roleId)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleId));
@@ -138,6 +146,7 @@ public class RoleService implements RoleUseCase {
     }
 
     @Override
+    @Transactional
     public void removePermission(Long roleId, Long permissionId) {
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleId));
