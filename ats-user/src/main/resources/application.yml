@@ -1,10 +1,12 @@
 server:
   port: 8083
 spring:
+  application:
+    name: ats-users
   datasource:
-    url: jdbc:postgresql://localhost:5433/ats_users
-    username: postgres
-    password: postgres
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ats-user}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
 
@@ -19,5 +21,9 @@ spring:
 
 security:
   jwt:
-    secret: ats-users-dev-secret-change-in-prod-2026
+    secret: ${JWT_SECRET:mi-secret-local-superseguro-worksync-2026-ats-usuarios}
     expiration-minutes: 50
+
+eureka:
+  client:
+    enabled: false
