@@ -13,12 +13,14 @@ import com.ats.user.domain.port.out.PasswordHasherPort;
 import com.ats.user.domain.port.out.RoleRepositoryPort;
 import com.ats.user.domain.port.out.UserRepositoryPort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
 @Service
+@Transactional(readOnly = true)
 public class UserService implements UserUseCase {
 
     private final UserRepositoryPort userRepository;
@@ -37,6 +39,7 @@ public class UserService implements UserUseCase {
     }
 
     @Override
+    @Transactional
     public User create(User user, Long roleId, String rawPassword) {
         if(userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new EmailAlreadyExistException("Email already registered: " + user.getEmail());
@@ -73,6 +76,7 @@ public class UserService implements UserUseCase {
     }
 
     @Override
+    @Transactional
     public User update(Long id, User user) {
         User currentUser= userRepository.findById(id)
                 .orElseThrow(()-> new UserNotFoundException("User not found: " + id));
@@ -85,6 +89,7 @@ public class UserService implements UserUseCase {
     }
 
     @Override
+    @Transactional
     public User changeUserRole(Long userId, Long roleId) {
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
@@ -102,6 +107,7 @@ public class UserService implements UserUseCase {
     }
 
     @Override
+    @Transactional
     public User updateStatus(Long id, boolean active) {
         User current = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + id));
@@ -111,6 +117,7 @@ public class UserService implements UserUseCase {
     }
 
     @Override
+    @Transactional
     public User delete(Long id) {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User not found: " + id);

@@ -8,11 +8,13 @@ import com.ats.user.domain.port.in.MenuUseCase;
 import com.ats.user.domain.port.out.MenuRepositoryPort;
 import com.ats.user.domain.port.out.ModuleRepositoryPort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class MenuService implements MenuUseCase {
 
     private final MenuRepositoryPort menuRepository;
@@ -24,6 +26,7 @@ public class MenuService implements MenuUseCase {
     }
 
     @Override
+    @Transactional
     public Menu create(Menu menu) {
         String normalizedPath = normalizePath(menu.getPath());
         if (menuRepository.existsByPathIgnoreCase(normalizedPath)) {
@@ -53,6 +56,7 @@ public class MenuService implements MenuUseCase {
     }
 
     @Override
+    @Transactional
     public Menu update(Long id, Menu menu) {
         Menu current = menuRepository.findById(id)
                 .orElseThrow(() -> new MenuNotFoundException("Menu not found: " + id));
@@ -76,6 +80,7 @@ public class MenuService implements MenuUseCase {
     }
 
     @Override
+    @Transactional
     public Menu updateStatus(Long id, boolean active) {
         Menu current = menuRepository.findById(id)
                 .orElseThrow(() -> new MenuNotFoundException("Menu not found: " + id));
@@ -85,6 +90,7 @@ public class MenuService implements MenuUseCase {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         Menu current = menuRepository.findById(id)
                 .orElseThrow(() -> new MenuNotFoundException("Menu not found: " + id));

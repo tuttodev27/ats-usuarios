@@ -6,11 +6,13 @@ import com.ats.user.domain.model.Module;
 import com.ats.user.domain.port.in.ModuleUserCase;
 import com.ats.user.domain.port.out.ModuleRepositoryPort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ModuleService implements ModuleUserCase {
     private final ModuleRepositoryPort moduleRepository;
 
@@ -19,6 +21,7 @@ public class ModuleService implements ModuleUserCase {
     }
 
     @Override
+    @Transactional
     public Module createModule(Module module) {
         String normalizedCode = normalizeCode(module.getCode());
         if (moduleRepository.existsByCodeIgnoreCase(normalizedCode)) {
@@ -46,6 +49,7 @@ public class ModuleService implements ModuleUserCase {
     }
 
     @Override
+    @Transactional
     public Module updateModule(Long id, Module module) {
         Module current = moduleRepository.findById(id)
                 .orElseThrow(() -> new ModuleNotFoundException("Module not found: " + id));
@@ -65,6 +69,7 @@ public class ModuleService implements ModuleUserCase {
     }
 
     @Override
+    @Transactional
     public Module updateModuleStatus(Long id, boolean active) {
         Module current = moduleRepository.findById(id)
                 .orElseThrow(() -> new ModuleNotFoundException("Module not found: " + id));
@@ -74,6 +79,7 @@ public class ModuleService implements ModuleUserCase {
     }
 
     @Override
+    @Transactional
     public void deleteModuleById(Long id) {
         Module current = moduleRepository.findById(id)
                 .orElseThrow(() -> new ModuleNotFoundException("Module not found: " + id));
