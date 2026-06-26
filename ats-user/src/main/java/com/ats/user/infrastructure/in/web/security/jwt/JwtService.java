@@ -1,5 +1,6 @@
 package com.ats.user.infrastructure.in.web.security.jwt;
 
+import com.ats.user.domain.port.out.TokenPort;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -16,7 +17,7 @@ import java.util.Date;
 import java.util.Map;
 
 @Service
-public class JwtService {
+public class JwtService implements TokenPort {
 
     private final SecretKey key;
     private final long expirationMinutes;

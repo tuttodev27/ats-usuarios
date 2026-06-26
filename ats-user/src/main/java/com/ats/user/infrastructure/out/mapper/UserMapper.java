@@ -1,8 +1,11 @@
 package com.ats.user.infrastructure.out.mapper;
 
+import com.ats.user.domain.model.Permission;
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.model.User;
+import com.ats.user.infrastructure.out.entity.PermissionEntity;
 import com.ats.user.infrastructure.out.entity.RoleEntity;
+import com.ats.user.infrastructure.out.entity.RolePermissionEntity;
 import com.ats.user.infrastructure.out.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,7 +15,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
-
 public interface UserMapper {
 
     @Mapping(target = "roles", expression = "java(toRoleEntities(user.getRoles()))")
@@ -43,7 +45,37 @@ public interface UserMapper {
                         .id(roleEntity.getId())
                         .name(roleEntity.getName())
                         .active(Boolean.TRUE.equals(roleEntity.getActive()))
+                        .permissions(toDomainPermissions(roleEntity.getRolePermissions()))
                         .build())
                 .collect(Collectors.toSet());
+    }
+
+    default Set<Permission> toDomainPermissions(Set<RolePermissionEntity> rolePermissions) {
+        if (rolePermissions == null || rolePermissions.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return rolePermissions.stream()
+                .filter(rp -> Boolean.TRUE.equals(rp.getActive()))
+                .map(RolePermissionEntity::getPermission)
+                .filter(p -> Boolean.TRUE.equals(p.getActive()))
+                .map(this::toDomainPermission)
+                .collect(Collectors.toSet());
+    }
+
+    default Permission toDomainPermission(PermissionEntity entity) {
+        return Permission.builder()
+                .id(entity.getId())
+                .code(entity.getCode())
+                .resource(entity.getResource())
+                .action(entity.getAction())
+                .scope(entity.getScope())
+                .description(entity.getDescription())
+                .moduleId(entity.getModule() != null ? entity.getModule().getId() : null)
+                .active(Boolean.TRUE.equals(entity.getActive()))
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .createdBy(entity.getCreatedBy())
+                .updatedBy(entity.getUpdatedBy())
+                .build();
     }
 }
