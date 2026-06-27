@@ -4,7 +4,7 @@ import com.ats.user.domain.model.Module;
 
 import java.util.List;
 
-public interface ModuleUserCase {
+public interface ModuleUseCase {
         Module createModule(Module module);
         List<Module> getModules();
         Module getModuleById(Long id);
