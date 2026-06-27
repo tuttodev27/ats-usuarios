@@ -3,7 +3,7 @@ package com.ats.user.infrastructure.in.web.security.controller;
 import com.ats.user.AtsUserApplication;
 import com.ats.user.domain.exception.ModuleNotFoundException;
 import com.ats.user.domain.model.Module;
-import com.ats.user.domain.port.in.ModuleUserCase;
+import com.ats.user.domain.port.in.ModuleUseCase;
 import com.ats.user.infrastructure.out.repository.MenuJpaRepository;
 import com.ats.user.infrastructure.out.repository.ModuleJpaRepository;
 import com.ats.user.infrastructure.out.repository.PermissionJpaRepository;
@@ -50,7 +50,7 @@ class ModuleControllerSecurityTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private ModuleUserCase moduleUseCase;
+    private ModuleUseCase moduleUseCase;
 
     @MockitoBean
     private UserJpaRepository userJpaRepository;

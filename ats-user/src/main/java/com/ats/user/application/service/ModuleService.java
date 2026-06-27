@@ -3,7 +3,7 @@ package com.ats.user.application.service;
 import com.ats.user.domain.exception.ModuleAlreadyExistsException;
 import com.ats.user.domain.exception.ModuleNotFoundException;
 import com.ats.user.domain.model.Module;
-import com.ats.user.domain.port.in.ModuleUserCase;
+import com.ats.user.domain.port.in.ModuleUseCase;
 import com.ats.user.domain.port.out.ModuleRepositoryPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
-public class ModuleService implements ModuleUserCase {
+public class ModuleService implements ModuleUseCase {
     private final ModuleRepositoryPort moduleRepository;
 
     public ModuleService(ModuleRepositoryPort moduleRepository) {

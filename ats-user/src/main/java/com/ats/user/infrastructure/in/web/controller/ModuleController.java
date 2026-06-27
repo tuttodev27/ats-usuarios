@@ -1,6 +1,6 @@
 package com.ats.user.infrastructure.in.web.controller;
 
-import com.ats.user.domain.port.in.ModuleUserCase;
+import com.ats.user.domain.port.in.ModuleUseCase;
 import com.ats.user.infrastructure.in.web.dto.request.CreateModuleRequest;
 import com.ats.user.infrastructure.in.web.dto.request.UpdateModuleRequest;
 import com.ats.user.infrastructure.in.web.dto.request.UpdateModuleStatusRequest;
@@ -39,7 +39,7 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class ModuleController {
 
-    private final ModuleUserCase moduleUseCase;
+    private final ModuleUseCase moduleUseCase;
     private final ModuleWebMapper moduleWebMapper;
 
     @PostMapping
