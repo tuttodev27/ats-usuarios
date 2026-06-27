@@ -85,7 +85,7 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", authorities = {"ROLE_ADMIN", "USER_CREATE"})
+    @WithMockUser(username = "admin@ats.local", authorities = {"USER_CREATE"})
     void saveUserShouldReturn201WhenUserHasCreatePermission() throws Exception {
         when(userUseCase.create(any(), anyLong(), anyString()))
                 .thenReturn(UserDumpData.domainUserExisting());
@@ -113,7 +113,7 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "recruiter@ats.local", authorities = {"ROLE_ADMIN", "USER_READ"})
+    @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_READ"})
     void listUsersShouldReturn200WhenUserHasReadPermission() throws Exception {
         var userPage = new Page<>(List.of(UserDumpData.domainUserExisting()), 0, 20, 1);
         when(userUseCase.listUsers(null, null, new com.ats.user.domain.model.PageQuery(0, 20)))
@@ -128,7 +128,7 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "recruiter@ats.local", authorities = {"ROLE_ADMIN", "USER_READ"})
+    @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_READ"})
     void listUsersShouldReturn200WhenFilteringActiveUsers() throws Exception {
         var userPage = new Page<>(List.of(UserDumpData.domainUserExisting()), 0, 20, 1);
         when(userUseCase.listUsers(null, true, new com.ats.user.domain.model.PageQuery(0, 20)))
@@ -155,7 +155,7 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "recruiter@ats.local", authorities = {"ROLE_ADMIN", "USER_READ"})
+    @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_READ"})
     void listAvailableRolesShouldReturn200WhenUserHasReadPermission() throws Exception {
         var admin = Role.builder().id(1L).name("ADMIN").description("Administrator role").active(true).build();
         var recruiter = Role.builder().id(2L).name("RECRUITER").description("Recruiter role").active(true).build();
@@ -171,7 +171,7 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "recruiter@ats.local", authorities = {"ROLE_ADMIN", "USER_UPDATE"})
+    @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_UPDATE"})
     void listAvailableRolesShouldReturn200WhenUserHasUpdatePermission() throws Exception {
         var admin = Role.builder().id(1L).name("ADMIN").description("Administrator role").active(true).build();
         when(userUseCase.listAvailableRoles()).thenReturn(List.of(admin));
@@ -198,7 +198,7 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "recruiter@ats.local", authorities = {"ROLE_ADMIN", "USER_READ"})
+    @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_READ"})
     void getUserByIdShouldReturn200WhenUserHasReadPermission() throws Exception {
         when(userUseCase.getById(1L)).thenReturn(UserDumpData.domainUserExisting());
 
@@ -227,7 +227,7 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "recruiter@ats.local", authorities = {"ROLE_ADMIN", "USER_UPDATE"})
+    @WithMockUser(username = "recruiter@ats.local", authorities = {"USER_UPDATE"})
     void updateUserShouldReturn200WhenUserHasUpdatePermission() throws Exception {
         when(userUseCase.update(anyLong(), any()))
                 .thenReturn(UserDumpData.domainUserExisting());
@@ -255,7 +255,7 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@ats.local", authorities = {"ROLE_ADMIN", "USER_DELETE"})
+    @WithMockUser(username = "admin@ats.local", authorities = {"USER_DELETE"})
     void deleteUserShouldReturn200WhenUserHasDeletePermission() throws Exception {
         when(userUseCase.delete(1L)).thenReturn(UserDumpData.domainUserExisting());
 

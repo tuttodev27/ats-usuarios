@@ -46,6 +46,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Estrategia única: authorities granulares (<RECURSO>_<ACCIÓN>) para todos los endpoints.
+                        // NO usar hasRole(). Cada método HTTP se protege con su propia authority.
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(
                                 "/v3/api-docs/**",
@@ -53,7 +55,12 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/users").hasAuthority("USER_CREATE")
+                        .requestMatchers(HttpMethod.GET, "/api/users/roles").hasAnyAuthority("USER_READ", "USER_UPDATE")
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasAuthority("USER_READ")
+                        .requestMatchers(HttpMethod.GET, "/api/users/*").hasAuthority("USER_READ")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/*").hasAuthority("USER_UPDATE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/*").hasAuthority("USER_DELETE")
 
                         .requestMatchers(HttpMethod.POST, "/api/roles").hasAuthority("ROLE_CREATE")
                         .requestMatchers(HttpMethod.GET, "/api/roles").hasAuthority("ROLE_READ")
