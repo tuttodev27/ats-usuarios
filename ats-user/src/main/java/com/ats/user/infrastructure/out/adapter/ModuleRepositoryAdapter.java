@@ -3,6 +3,7 @@ package com.ats.user.infrastructure.out.adapter;
 import com.ats.user.domain.model.Module;
 import com.ats.user.domain.port.out.ModuleRepositoryPort;
 import com.ats.user.infrastructure.out.entity.ModuleEntity;
+import com.ats.user.infrastructure.out.mapper.ModuleMapper;
 import com.ats.user.infrastructure.out.repository.ModuleJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import java.util.Optional;
 public class ModuleRepositoryAdapter implements ModuleRepositoryPort {
 
     private final ModuleJpaRepository moduleJpaRepository;
+    private final ModuleMapper moduleMapper;
 
     @Override
     public Module save(Module module) {
@@ -31,18 +33,18 @@ public class ModuleRepositoryAdapter implements ModuleRepositoryPort {
         entity.setCreatedBy(module.getCreatedBy());
         entity.setUpdatedBy(module.getUpdatedBy());
 
-        return toDomain(moduleJpaRepository.save(entity));
+        return moduleMapper.toDomain(moduleJpaRepository.save(entity));
     }
 
     @Override
     public Optional<Module> findById(Long id) {
-        return moduleJpaRepository.findById(id).map(this::toDomain);
+        return moduleJpaRepository.findById(id).map(moduleMapper::toDomain);
     }
 
     @Override
     public List<Module> findAll() {
         return moduleJpaRepository.findAllByOrderByIdAsc().stream()
-                .map(this::toDomain)
+                .map(moduleMapper::toDomain)
                 .toList();
     }
 
@@ -53,20 +55,6 @@ public class ModuleRepositoryAdapter implements ModuleRepositoryPort {
 
     @Override
     public Optional<Module> findByCodeIgnoreCase(String code) {
-        return moduleJpaRepository.findByCodeIgnoreCase(code).map(this::toDomain);
-    }
-
-    private Module toDomain(ModuleEntity entity) {
-        return Module.builder()
-                .id(entity.getId())
-                .code(entity.getCode())
-                .name(entity.getName())
-                .description(entity.getDescription())
-                .active(Boolean.TRUE.equals(entity.getActive()))
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .createdBy(entity.getCreatedBy())
-                .updatedBy(entity.getUpdatedBy())
-                .build();
+        return moduleJpaRepository.findByCodeIgnoreCase(code).map(moduleMapper::toDomain);
     }
 }
