@@ -1,6 +1,6 @@
 package com.ats.user.application.service;
 
-import com.ats.user.application.service.password.PasswordPolicy;
+import com.ats.user.domain.service.PasswordPolicy;
 import com.ats.user.domain.exception.EmailAlreadyExistException;
 import com.ats.user.domain.exception.RoleNotAvailableException;
 import com.ats.user.domain.exception.UserNotFoundException;
