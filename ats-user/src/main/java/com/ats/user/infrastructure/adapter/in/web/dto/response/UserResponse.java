@@ -1,0 +1,17 @@
+package com.ats.user.infrastructure.adapter.in.web.dto.response;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+
+public record UserResponse(
+        Long id,
+        String name,
+        String lastName,
+        String email,
+        String countryCode,
+        String phone,
+        Boolean active,
+        LocalDateTime createdAt,
+        Set<String> roles
+) {
+}

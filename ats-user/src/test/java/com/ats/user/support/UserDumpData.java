@@ -2,8 +2,8 @@ package com.ats.user.support;
 
 import com.ats.user.domain.model.Role;
 import com.ats.user.domain.model.User;
-import com.ats.user.infrastructure.out.entity.RoleEntity;
-import com.ats.user.infrastructure.out.entity.UserEntity;
+import com.ats.user.infrastructure.adapter.out.persistence.entity.RoleEntity;
+import com.ats.user.infrastructure.adapter.out.persistence.entity.UserEntity;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
