@@ -3,6 +3,7 @@ package com.ats.user.application.service;
 import com.ats.user.domain.model.Permission;
 import com.ats.user.domain.port.in.PermissionUseCase;
 import com.ats.user.domain.port.out.PermissionRepositoryPort;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ public class PermissionService implements PermissionUseCase {
     }
 
     @Override
+    @Cacheable(value = "permissions", key = "{#moduleId, #active}")
     public List<Permission> list(Long moduleId, Boolean active) {
         if (moduleId == null && active == null) {
             return permissionRepository.findAll();

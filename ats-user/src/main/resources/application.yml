@@ -10,6 +10,11 @@ spring:
     driver-class-name: org.postgresql.Driver
 
 
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=5m
+
   jpa:
     hibernate:
       ddl-auto: validate
