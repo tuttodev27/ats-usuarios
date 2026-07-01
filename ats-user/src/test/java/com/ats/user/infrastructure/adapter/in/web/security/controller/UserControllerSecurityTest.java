@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -256,12 +257,12 @@ class UserControllerSecurityTest {
 
     @Test
     @WithMockUser(username = "admin@ats.local", authorities = {"ROLE_ADMIN", "USER_DELETE"})
-    void deleteUserShouldReturn200WhenUserHasDeletePermission() throws Exception {
+    void deleteUserShouldReturn204WhenUserHasDeletePermission() throws Exception {
         when(userUseCase.delete(1L)).thenReturn(UserDumpData.domainUserExisting());
 
         mockMvc.perform(delete("/api/users/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("admin@ats.local"));
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
     }
 
     private String validCreateUserRequestJson() {
