@@ -10,6 +10,8 @@ import com.ats.user.domain.model.Role;
 import com.ats.user.domain.port.in.RoleUseCase;
 import com.ats.user.domain.port.out.PermissionRepositoryPort;
 import com.ats.user.domain.port.out.RoleRepositoryPort;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,7 @@ public class RoleService implements RoleUseCase {
 
     @Override
     @Transactional
+    @CacheEvict(value = "roles", allEntries = true)
     public Role create(Role role) {
         String normalizedName = normalizeName(role.getName());
         if (roleRepository.existsByNameIgnoreCase(normalizedName)) {
@@ -48,6 +51,7 @@ public class RoleService implements RoleUseCase {
     }
 
     @Override
+    @Cacheable("roles")
     public List<Role> list() {
         return roleRepository.findAll();
     }
@@ -58,6 +62,7 @@ public class RoleService implements RoleUseCase {
     }
 
     @Override
+    @Cacheable(value = "roles", key = "#id")
     public Role getById(Long id) {
         return roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + id));
@@ -65,6 +70,7 @@ public class RoleService implements RoleUseCase {
 
     @Override
     @Transactional
+    @CacheEvict(value = "roles", allEntries = true)
     public Role update(Long id, Role role) {
         Role current = roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + id));
@@ -84,6 +90,7 @@ public class RoleService implements RoleUseCase {
 
     @Override
     @Transactional
+    @CacheEvict(value = "roles", allEntries = true)
     public void delete(Long id) {
         Role current = roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + id));
@@ -94,6 +101,7 @@ public class RoleService implements RoleUseCase {
 
     @Override
     @Transactional
+    @CacheEvict(value = "roles", allEntries = true)
     public Role assignPermissions(Long roleId, List<Long> permissionIds) {
         if (permissionIds == null) {
             throw new IllegalArgumentException("Permission ids are required");
@@ -121,6 +129,7 @@ public class RoleService implements RoleUseCase {
 
     @Override
     @Transactional
+    @CacheEvict(value = "roles", allEntries = true)
     public Role updateStatus(Long id, boolean active) {
         Role current = roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + id));
@@ -131,6 +140,7 @@ public class RoleService implements RoleUseCase {
 
     @Override
     @Transactional
+    @CacheEvict(value = "roles", allEntries = true)
     public Role deletePermissions(Long roleId, List<Long> permissionIds) {
         Role role= roleRepository.findById(roleId)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleId));
@@ -147,6 +157,7 @@ public class RoleService implements RoleUseCase {
 
     @Override
     @Transactional
+    @CacheEvict(value = "roles", allEntries = true)
     public void removePermission(Long roleId, Long permissionId) {
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleId));
