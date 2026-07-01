@@ -48,6 +48,10 @@ dependencies {
 	// PostgreSQL
 	runtimeOnly 'org.postgresql:postgresql:42.7.5'
 
+	// Flyway
+	implementation 'org.flywaydb:flyway-core'
+	runtimeOnly 'org.flywaydb:flyway-database-postgresql'
+
 	// Metrics
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
