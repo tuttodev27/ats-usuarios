@@ -36,6 +36,8 @@ public class RoleRepositoryAdapter implements RoleRepositoryPort {
         entity.setActive(role.isActive());
         entity.setCreatedAt(role.getCreatedAt());
         entity.setUpdatedAt(role.getUpdatedAt());
+        entity.setCreatedBy(role.getCreatedBy());
+        entity.setUpdatedBy(role.getUpdatedBy());
 
         if (entity.getId() == null) {
             entity = roleJpaRepository.save(entity);

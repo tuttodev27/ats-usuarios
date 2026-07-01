@@ -15,8 +15,6 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface RoleMapper {
 
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "updatedBy", ignore = true)
     @Mapping(target = "permissions", expression = "java(toDomainPermissions(entity.getRolePermissions()))")
     Role toDomain(RoleEntity entity);
 

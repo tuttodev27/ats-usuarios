@@ -47,6 +47,8 @@ public class RoleEntity {
     @Column(nullable = false)
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+    Long createdBy;
+    Long updatedBy;
 
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
