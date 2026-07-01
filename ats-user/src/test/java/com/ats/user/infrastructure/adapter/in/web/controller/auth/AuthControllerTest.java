@@ -37,7 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         properties = {
                 "spring.autoconfigure.exclude=org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration,"
                         + "org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration,"
-                        + "org.springframework.boot.data.jpa.autoconfigure.DataJpaRepositoriesAutoConfiguration"
+                        + "org.springframework.boot.data.jpa.autoconfigure.DataJpaRepositoriesAutoConfiguration",
+                "auth.rate-limit.requests-per-minute=100"
         }
 )
 @AutoConfigureMockMvc
