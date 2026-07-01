@@ -31,16 +31,16 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final AuthUseCase authUseCase;
     private final TokenPort tokenPort;
-
-    @Value("${security.jwt.expiration-minutes:50}")
-    private long expirationMinutes;
+    private final long expirationMinutes;
 
     public AuthController(AuthenticationManager authenticationManager,
                           AuthUseCase authUseCase,
-                          TokenPort tokenPort) {
+                          TokenPort tokenPort,
+                          @Value("${security.jwt.expiration-minutes:50}") long expirationMinutes) {
         this.authenticationManager = authenticationManager;
         this.authUseCase = authUseCase;
         this.tokenPort = tokenPort;
+        this.expirationMinutes = expirationMinutes;
     }
 
     @PostMapping("/login")
