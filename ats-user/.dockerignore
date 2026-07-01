@@ -1,0 +1,10 @@
+.gradle/
+src/
+gradle/
+gradlew
+gradlew.bat
+.gradle/
+.git/
+.gitattributes
+.gitignore
+*.md

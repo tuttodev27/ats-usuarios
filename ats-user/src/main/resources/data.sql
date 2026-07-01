@@ -42,10 +42,10 @@ VALUES
     (23, 'PERMISSION_READ',      'Read Permission',     'permissions','read',   'global', 'View permission list',            TRUE, NOW(), NOW(), 5)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO roles (id, name, description, active, created_at, updated_at)
+INSERT INTO roles (id, name, description, active, created_at, updated_at, created_by, updated_by)
 VALUES
-    (1, 'ADMIN',     'System administrator with full access', TRUE, NOW(), NOW()),
-    (2, 'RECRUITER', 'Recruiter with limited access',         TRUE, NOW(), NOW())
+    (1, 'ADMIN',     'System administrator with full access', TRUE, NOW(), NOW(), 1, 1),
+    (2, 'RECRUITER', 'Recruiter with limited access',         TRUE, NOW(), NOW(), 1, 1)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO role_permissions (role_id, permission_id, active, created_at, updated_at)
