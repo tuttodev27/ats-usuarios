@@ -7,17 +7,23 @@ import java.time.Instant;
 @Schema(example = """
         {
           "timestamp": "2026-06-05T10:00:00Z",
-          "status": 401,
-          "code": "UNAUTHORIZED",
-          "message": "Authentication required",
-          "path": "/api/users"
+          "status": 500,
+          "code": "INTERNAL_ERROR",
+          "message": "Unexpected error",
+          "path": "/api/users",
+          "errorId": "a1b2c3d4-1234-5678-9abc-def012345678"
         }
         """)
 public record ErrorResponse(
         @Schema(example = "2026-06-05T10:00:00Z") Instant timestamp,
-        @Schema(example = "401") int status,
-        @Schema(example = "UNAUTHORIZED") String code,
-        @Schema(example = "Authentication required") String message,
-        @Schema(example = "/api/users") String path
+        @Schema(example = "500") int status,
+        @Schema(example = "INTERNAL_ERROR") String code,
+        @Schema(example = "Unexpected error") String message,
+        @Schema(example = "/api/users") String path,
+        @Schema(example = "a1b2c3d4-1234-5678-9abc-def012345678") String errorId
 ) {
+
+    public ErrorResponse(Instant timestamp, int status, String code, String message, String path) {
+        this(timestamp, status, code, message, path, null);
+    }
 }
