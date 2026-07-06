@@ -3,10 +3,12 @@ server:
 spring:
   application:
     name: ats-users
+  profiles:
+    active: dev
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/ats-user}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ats_user}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
 
