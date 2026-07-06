@@ -66,8 +66,8 @@ WHERE p.code IN ('USER_READ', 'ROLE_READ', 'MENU_READ', 'MODULE_READ', 'PERMISSI
 
 INSERT INTO users (id, name, last_name, email, password_hash, country_code, phone, active, created_at, updated_at)
 VALUES
-    (1, 'System', 'Admin',  'admin@ats.local',           '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '+57', '3001002000', TRUE, NOW(), NOW()),
-    (2, 'Pablo',  'Gallegos', 'pgallegoscelis86@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '+56', '989421155',  TRUE, NOW(), NOW())
+    (1, 'System', 'Admin',  'admin@ats.local',           '$2b$12$TZHOwlKS9M21GzNk9RiE2OumUGzn6uMdL8NieyQm4e9esoTP8HzFi', '+57', '3001002000', TRUE, NOW(), NOW()),
+    (2, 'Pablo',  'Gallegos', 'pgallegoscelis86@gmail.com', '$2b$12$TZHOwlKS9M21GzNk9RiE2OumUGzn6uMdL8NieyQm4e9esoTP8HzFi', '+56', '989421155',  TRUE, NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO user_roles (user_id, role_id)
