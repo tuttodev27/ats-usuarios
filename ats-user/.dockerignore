@@ -1,9 +1,5 @@
 .gradle/
-src/
-gradle/
-gradlew
-gradlew.bat
-.gradle/
+build/
 .git/
 .gitattributes
 .gitignore

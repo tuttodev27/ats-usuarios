@@ -17,7 +17,7 @@ services:
       timeout: 5s
       retries: 5
 
-  app:
+  ats-user:
     build: .
     container_name: ats-user-app
     ports:
@@ -26,6 +26,7 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/ats_user
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      JWT_SECRET: ${JWT_SECRET:-mi-secret-local-superseguro-worksync-2026-ats-usuarios}
     depends_on:
       postgres:
         condition: service_healthy
