@@ -54,7 +54,7 @@ public class JwtService implements TokenPort {
                 .claims(safeClaims)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(exp))
-                .signWith(key)
+                .signWith(key, Jwts.SIG.HS256)
                 .compact();
     }
 
