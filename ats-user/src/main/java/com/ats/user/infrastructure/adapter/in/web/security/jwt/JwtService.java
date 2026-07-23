@@ -6,7 +6,6 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -28,19 +27,6 @@ public class JwtService implements TokenPort {
     ) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMinutes = expirationMinutes;
-    }
-
-    public String generateToken(UserDetails userDetails) {
-
-        Map<String, Object> claims = Map.of(
-                "roles", userDetails.getAuthorities()
-                        .stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .toList(),
-                "email", userDetails.getUsername()
-        );
-
-        return generateToken(userDetails.getUsername(), claims);
     }
 
     public String generateToken(String subject, Map<String, Object> extraClaims) {
