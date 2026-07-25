@@ -74,9 +74,12 @@ INSERT INTO user_roles (user_id, role_id)
 SELECT 1, 1
 WHERE NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = 1 AND role_id = 1);
 
+-- Remove any existing roles for user 2 (pgallegos) to ensure only ADMIN
+DELETE FROM user_roles WHERE user_id = 2;
+
 INSERT INTO user_roles (user_id, role_id)
-SELECT 2, 2
-WHERE NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = 2 AND role_id = 2);
+SELECT 2, 1
+WHERE NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = 2 AND role_id = 1);
 
 -- Sync sequences so new rows don't collide with seed IDs
 SELECT setval('modules_id_seq',          COALESCE((SELECT MAX(id) FROM modules),          1));

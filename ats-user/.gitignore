@@ -6,8 +6,12 @@ gradle/wrapper/gradle-wrapper.properties
 
 # IDE
 .idea/
+.vscode/
 *.iml
 bin/
+
+# Maven
+target/
 
 # Java
 *.class
