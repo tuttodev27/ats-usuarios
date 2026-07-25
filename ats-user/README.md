@@ -1,139 +1,172 @@
 # ATS Usuarios
 
-API REST para autenticación y gestión de usuarios con roles usando Spring Boot, Spring Security (JWT) y PostgreSQL.
+Microservicio de autenticacion y gestion de usuarios con roles, permisos, modulos y menus de navegacion.
 
-## Requisitos
-- Java 21
-- Docker y Docker Compose
-- Gradle Wrapper (`./gradlew`)
-- Postman (opcional para pruebas)
+[![Java](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.2-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Gradle](https://img.shields.io/badge/Gradle-8.x-02303A?logo=gradle&logoColor=white)](https://gradle.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](#)
 
-## Tecnologías
-- Spring Boot 4
-- Spring Security + JWT
-- Spring Data JPA
-- PostgreSQL 16
-- MapStruct
+---
 
-## Estructura del proyecto
-- Código backend: `ats-user/src/main/java`
-- Configuración: `ats-user/src/main/resources/application.yml`
-- Script SQL inicial: `ats-user/src/main/resources/db/init/01_schema_and_seed.sql`
-- Docker DB: `ats-user/docker-compose.yml`
+## Tabla de Contenidos
 
-## Levantar base de datos
-Desde `ats-user/`:
+- [Descripcion General](#descripcion-general)
+- [Stack Tecnologico](#stack-tecnologico)
+- [Arquitectura](#arquitectura)
+- [Prerrequisitos](#prerrequisitos)
+- [Inicio Rapido](#inicio-rapido)
+- [Base de Datos](#base-de-datos)
+- [Swagger - OpenAPI](#swagger--openapi)
+- [Docker](#docker)
 
-```bash
-docker compose up -d
+
+---
+
+## Descripcion General
+
+**ATS Usuarios** es un microservicio REST construido con Spring Boot 4 que gestiona:
+
+- **Autenticacion** con JWT (JSON Web Tokens)
+- **Usuarios** con roles asignados (CRUD completo, paginacion, busqueda)
+- **Roles** con permisos granulares por autoridad
+- **Permisos** organizados por modulos (RESOURCE + ACTION + SCOPE)
+- **Modulos** del sistema
+- **Menus** de navegacion con permisos requeridos
+
+Sigue una **arquitectura hexagonal** (puertos y adaptadores) que separa la logica de dominio de la infraestructura.
+
+---
+
+## Stack Tecnologico
+
+| Capa | Tecnologia | Version |
+|------|-----------|---------|
+| Lenguaje | Java | 21 |
+| Framework | Spring Boot | 4.0.2 |
+| Seguridad | Spring Security + JWT | JJWT 0.12.6 |
+| Persistencia | Spring Data JPA + Hibernate | - |
+| Base de datos | PostgreSQL | 16 |
+| Migraciones | Flyway | - |
+| Mapeo | MapStruct | 1.6.3 |
+| Cache | Caffeine | - |
+| API Docs | SpringDoc OpenAPI | 2.8.13 |
+| Metricas | Micrometer + Prometheus | - |
+| Validacion | Spring Validation | - |
+| Build | Gradle | Wrapper |
+| Contenedores | Docker + Docker Compose | - |
+
+---
+
+## Arquitectura
+
+El proyecto sigue el patron **Hexagonal (Puertos y Adaptadores)**:
+
+```
+com.ats.user
+├── domain/                  # Capa de dominio (nucleo)
+│   ├── model/               # Entidades de negocio (User, Role, Permission, Module, Menu)
+│   ├── port/
+│   │   ├── in/              # Puertos de entrada (Use Cases)
+│   │   └── out/             # Puertos de salida (Repository Ports)
+│   ├── service/             # Servicios de dominio
+│   └── exception/           # Excepciones de negocio
+│
+├── application/             # Capa de aplicacion
+│   └── service/             # Implementacion de casos de uso
+│
+└── infrastructure/          # Capa de infraestructura
+    ├── config/              # Configuracion (OpenAPI, etc.)
+    └── adapter/
+        ├── in/web/          # Adaptadores de entrada
+        │   ├── controller/  # Controladores REST
+        │   ├── dto/         # Requests y Responses
+        │   ├── security/    # JWT, CORS, Filtros
+        │   └── exception/   # Manejador global de excepciones
+        └── out/persistence/ # Adaptadores de salida
+            ├── adapter/     # Implementacion de puertos de repositorio
+            ├── entity/      # Entidades JPA
+            ├── mapper/      # Mappers MapStruct
+            ├── repository/  # Interfaces JPA Repository
+            └── specification/ # Specifications para busquedas
 ```
 
-Datos de conexión local:
-- Host: `localhost`
-- Puerto: `5433`
-- DB: `ats_users`
-- Usuario: `postgres`
-- Password: `postgres`
+---
 
-## Cargar esquema y datos semilla
-Desde la raíz del repo:
+## Prerrequisitos
+
+- **Java 21** (JDK)
+- **Docker** y **Docker Compose**
+- **Gradle** (o usar el wrapper `./gradlew` incluido)
+
+---
+
+## Inicio Rapido
+
+### 1. Levantar la base de datos
 
 ```bash
-docker exec -i ats-user-postgres psql -U postgres -d ats_users < ats-user/src/main/resources/db/init/01_schema_and_seed.sql
+docker compose up -d postgres
 ```
 
-Usuarios semilla:
-- `admin@ats.local` / `Admin123`
-- `recruiter@ats.local` / `Recruiter123`
-
-## Ejecutar la aplicación
-Desde `ats-user/`:
+### 2. Ejecutar la aplicacion
 
 ```bash
 ./gradlew bootRun
 ```
 
-La API queda en:
-- `http://localhost:8083`
+La API estara disponible en: **http://localhost:8083**
 
-## Flujo de prueba en Postman
-1. Login
-```http
-POST /api/auth/login
-```
-Body:
-```json
-{
-  "email": "admin@ats.local",
-  "password": "Admin123"
-}
+### 3. Probar el login
+
+```bash
+curl -X POST http://localhost:8083/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@ats.local","password":"Admin123"}'
 ```
 
-2. Obtener roles (requiere token)
-```http
-GET /api/users/roles
-Authorization: Bearer <TOKEN>
+---
+
+## Base de Datos
+
+### Migraciones (Flyway)
+
+Las migraciones se encuentran en `src/main/resources/db/migration/`:
+
+| Archivo | Descripcion |
+|---------|------------|
+| `V1__init.sql` | Crea las 7 tablas: modules, permissions, menus, roles, role_permissions, users, user_roles |
+| `V2__add_audit_columns_to_roles.sql` | Agrega columnas `created_by` y `updated_by` a la tabla roles |
+
+---
+
+## Swagger - OpenAPI
+
+La documentacion interactiva de la API esta disponible en:
+
+- **Swagger UI:** http://localhost:8083/swagger-ui.html
+- **OpenAPI JSON:** http://localhost:8083/v3/api-docs
+
+Todos los endpoints estan documentados con anotaciones `@Operation` y `@ApiResponses` de Swagger. El esquema de seguridad Bearer JWT esta configurado automaticamente.
+
+---
+
+## Docker
+
+### Docker Compose
+
+Ejecutar la aplicacion completa (BD + App):
+
+```bash
+docker compose up -d
 ```
 
-3. Crear usuario (requiere token)
-```http
-POST /api/users
-Authorization: Bearer <TOKEN>
-Content-Type: application/json
-```
-Body:
-```json
-{
-  "name": "Pablo",
-  "lastName": "Gallegos",
-  "email": "pablo@ats.local",
-  "countryCode": "+56",
-  "phone": "989421155",
-  "password": "Clave123",
-  "role": "RECRUITER"
-}
-```
+Servicios:
+- **postgres** - PostgreSQL 16 en puerto `5432`
+- **ats-user** - Aplicacion Spring Boot en puerto `8083`
 
-4. Listar usuarios activos
-```http
-GET /api/users
-Authorization: Bearer <TOKEN>
-```
+---
+## Licencia
 
-5. Obtener usuario por id
-```http
-GET /api/users/{id}
-Authorization: Bearer <TOKEN>
-```
-
-6. Actualizar usuario
-```http
-PUT /api/users/{id}
-Authorization: Bearer <TOKEN>
-Content-Type: application/json
-```
-Body:
-```json
-{
-  "name": "Pablo",
-  "lastName": "Gallegos",
-  "countryCode": "+56",
-  "phone": "989421156",
-  "active": true
-}
-```
-
-7. Eliminar usuario (borrado lógico)
-```http
-DELETE /api/users/{id}
-Authorization: Bearer <TOKEN>
-```
-
-## Errores comunes
-- `401 UNAUTHORIZED`: token inválido, incompleto o sin prefijo `Bearer `.
-- `ROLE_NOT_FOUND`: el rol enviado no existe o está inactivo en BD.
-- `EMAIL_ALREADY_EXISTS`: ya existe un usuario con ese correo.
-
-## Notas
-- La columna usada para indicativo es `country_code`.
-- No usar header `Authorization` manual y `Bearer Token` al mismo tiempo en Postman.
+Proyecto privado - ATS Team (Pablo Gallegos)
