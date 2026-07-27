@@ -166,7 +166,7 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(current));
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        User updated = userService.update(1L, update);
+        User updated = userService.update(1L, update, null);
 
         assertEquals("Pablo Updated", updated.getName());
         assertEquals("Gallegos Updated", updated.getLastName());

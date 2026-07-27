@@ -48,7 +48,7 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Autenticacion exitosa, retorna JWT",
                     content = @Content(schema = @Schema(implementation = LoginResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Credenciales invalidas",
+            @ApiResponse(responseCode = "401", description = "Credenciales invalidas",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "No autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

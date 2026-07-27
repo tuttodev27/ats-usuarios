@@ -230,7 +230,7 @@ class UserControllerSecurityTest {
     @Test
     @WithMockUser(username = "recruiter@ats.local", authorities = {"ROLE_ADMIN", "USER_UPDATE"})
     void updateUserShouldReturn200WhenUserHasUpdatePermission() throws Exception {
-        when(userUseCase.update(anyLong(), any()))
+        when(userUseCase.update(anyLong(), any(), any()))
                 .thenReturn(UserDumpData.domainUserExisting());
 
         mockMvc.perform(put("/api/users/1")

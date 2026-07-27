@@ -162,7 +162,7 @@ public class UserController {
             @Valid @RequestBody UpdateUserRequest request
     ) {
         var user = userWebMapper.toDomain(request);
-        var updated = userUseCase.update(id, user);
+        var updated = userUseCase.update(id, user, request.roleId());
         return ResponseEntity.ok(userWebMapper.toResponse(updated));
     }
 

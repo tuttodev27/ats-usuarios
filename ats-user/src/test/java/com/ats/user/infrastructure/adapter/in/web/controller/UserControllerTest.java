@@ -220,7 +220,7 @@ class UserControllerTest {
                 .roles(Set.of(role))
                 .build();
 
-        when(userUseCase.update(anyLong(), any())).thenReturn(updatedUser);
+        when(userUseCase.update(anyLong(), any(), any())).thenReturn(updatedUser);
 
         mockMvc.perform(put("/api/users/1")
                         .contentType(APPLICATION_JSON)
@@ -236,7 +236,7 @@ class UserControllerTest {
     @Test
     @WithMockUser(username = "admin@ats.local", authorities = {"ROLE_ADMIN", "USER_UPDATE"})
     void updateUserShouldReturn404WhenUserNotFound() throws Exception {
-        when(userUseCase.update(anyLong(), any()))
+        when(userUseCase.update(anyLong(), any(), any()))
                 .thenThrow(new UserNotFoundException("User not found: 99"));
 
         mockMvc.perform(put("/api/users/99")
