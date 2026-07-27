@@ -73,7 +73,7 @@ public class UserService implements UserUseCase {
     }
 
     @Override
-    public User update(Long id, User user) {
+    public User update(Long id, User user, Long roleId) {
         User currentUser= userRepository.findById(id)
                 .orElseThrow(()-> new UserNotFoundException("User not found: " + id));
         currentUser.setName(user.getName());
@@ -81,6 +81,14 @@ public class UserService implements UserUseCase {
         currentUser.setCountryCode(user.getCountryCode());
         currentUser.setPhone(user.getPhone());
         currentUser.setUpdatedAt(LocalDateTime.now());
+        if (roleId != null) {
+            var role = roleRepository.findById(roleId)
+                    .orElseThrow(() -> new RoleNotAvailableException("Role not found: " + roleId));
+            if (!role.isActive()) {
+                throw new RoleNotAvailableException("Role is not active: " + roleId);
+            }
+            currentUser.setRoles(Set.of(role));
+        }
         return userRepository.save(currentUser);
     }
 
